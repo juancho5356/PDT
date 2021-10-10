@@ -1,64 +1,21 @@
 package Modelo;
 
-import java.time.LocalDate;
-import java.util.LinkedList;
-
 public class Investigador extends Usuario{
 
+	private String idInvestigador;
 	private String documento;
 	private String domicilio;
 	private String telefono;
-	private String contrato;
-	private String profesion;
-	private LocalDate vtoContrato;
-	private LinkedList<String> listaTareas;
 	
 	public Investigador() {
 	}
 
-	public Investigador(String documento, String domicilio, String telefono, String contrato, String profesion,
-			LocalDate vtoContrato, LinkedList<String> listaTareas) {
+	public Investigador(String idInvestigador, String documento, String domicilio, String telefono) {
 		super();
+		this.idInvestigador = idInvestigador;
 		this.documento = documento;
 		this.domicilio = domicilio;
 		this.telefono = telefono;
-		this.contrato = contrato;
-		this.profesion = profesion;
-		this.vtoContrato = vtoContrato;
-		this.listaTareas = listaTareas;
-	}
-
-
-	public String getContrato() {
-		return contrato;
-	}
-
-	public void setContrato(String contrato) {
-		this.contrato = contrato;
-	}
-
-	public String getProfesion() {
-		return profesion;
-	}
-
-	public void setProfesion(String profesion) {
-		this.profesion = profesion;
-	}
-
-	public LocalDate getVtoContrato() {
-		return vtoContrato;
-	}
-
-	public void setVtoContrato(LocalDate vtoContrato) {
-		this.vtoContrato = vtoContrato;
-	}
-
-	public LinkedList<String> getListaTareas() {
-		return listaTareas;
-	}
-
-	public void setListaTareas(LinkedList<String> listaTareas) {
-		this.listaTareas = listaTareas;
 	}
 
 	public String getDocumento() {
@@ -83,5 +40,13 @@ public class Investigador extends Usuario{
 
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
+	}
+
+	public String getIdInvestigador() {
+		return idInvestigador;
+	}
+
+	public void setIdInvestigador(String idInvestigador) {
+		this.idInvestigador = idInvestigador;
 	}
 }

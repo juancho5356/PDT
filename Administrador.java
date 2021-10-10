@@ -1,27 +1,24 @@
 package Modelo;
 
-import java.util.LinkedList;
-
 public class Administrador extends Usuario{
 
+	private String idAdministrador;
 	private String documento;
-	private String instituto;
 	private String domicilio;
 	private String telefono;
-	private LinkedList<String> listaTareas;
 
 	public Administrador() {
 	}
 
-	public Administrador(String documento, String instituto, String domicilio, String telefono,
-			LinkedList<String> listaTareas) {
+	
+	public Administrador(String idAdministrador, String documento, String domicilio, String telefono) {
 		super();
+		this.idAdministrador = idAdministrador;
 		this.documento = documento;
-		this.instituto = instituto;
 		this.domicilio = domicilio;
 		this.telefono = telefono;
-		this.listaTareas = listaTareas;
 	}
+
 
 	public String getDocumento() {
 		return documento;
@@ -30,23 +27,6 @@ public class Administrador extends Usuario{
 	public void setDocumento(String documento) {
 		this.documento = documento;
 	}
-
-	public String getInstituto() {
-		return instituto;
-	}
-
-	public void setInstituto(String instituto) {
-		this.instituto = instituto;
-	}
-
-	public LinkedList<String> getListaTareas() {
-		return listaTareas;
-	}
-
-	public void setListaTareas(LinkedList<String> listaTareas) {
-		this.listaTareas = listaTareas;
-	}
-
 	public String getDomicilio() {
 		return domicilio;
 	}
@@ -61,5 +41,13 @@ public class Administrador extends Usuario{
 
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
+	}
+
+	public String getIdAdministrador() {
+		return idAdministrador;
+	}
+
+	public void setIdAdministrador(String idAdministrador) {
+		this.idAdministrador = idAdministrador;
 	}
 }
