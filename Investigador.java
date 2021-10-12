@@ -1,28 +1,52 @@
-package Modelo;
+package modelo;
 
 public class Investigador extends Usuario{
-
-	private String idInvestigador;
-	private String documento;
+	
+	private int idInvestigador;
+	private int documento;
 	private String domicilio;
-	private String telefono;
+	private int telefono;
+	private Ciudad ciudad;
 	
 	public Investigador() {
 	}
-
-	public Investigador(String idInvestigador, String documento, String domicilio, String telefono) {
-		super();
-		this.idInvestigador = idInvestigador;
+	
+	public Investigador(int idUsuario, String nombre, String apellido, String mail, String nombreUsuario,
+			String contrasenia, int documento, String domicilio, int telefono,
+			Ciudad ciudad) {
+		
+		super(idUsuario, nombre, apellido, mail, nombreUsuario, contrasenia);
 		this.documento = documento;
 		this.domicilio = domicilio;
 		this.telefono = telefono;
+		this.ciudad = ciudad;
 	}
 
-	public String getDocumento() {
+	public Investigador(int idUsuario, String nombre, String apellido, String mail, String nombreUsuario,
+			String contrasenia, int id, int documento, String domicilio, int telefono,
+			Ciudad ciudad) {
+		
+		super(idUsuario, nombre, apellido, mail, nombreUsuario, contrasenia);
+		this.idInvestigador = id;
+		this.documento = documento;
+		this.domicilio = domicilio;
+		this.telefono = telefono;
+		this.ciudad = ciudad;
+	}
+
+	public int getIdInvestigador() {
+		return idInvestigador;
+	}
+
+	public void setIdInvestigador(int idInvestigador) {
+		this.idInvestigador = idInvestigador;
+	}
+
+	public int getDocumento() {
 		return documento;
 	}
 
-	public void setDocumento(String documento) {
+	public void setDocumento(int documento) {
 		this.documento = documento;
 	}
 
@@ -34,19 +58,21 @@ public class Investigador extends Usuario{
 		this.domicilio = domicilio;
 	}
 
-	public String getTelefono() {
+	public int getTelefono() {
 		return telefono;
 	}
 
-	public void setTelefono(String telefono) {
+	public void setTelefono(int telefono) {
 		this.telefono = telefono;
 	}
 
-	public String getIdInvestigador() {
-		return idInvestigador;
+	public Ciudad getCiudad() {
+		return ciudad;
 	}
 
-	public void setIdInvestigador(String idInvestigador) {
-		this.idInvestigador = idInvestigador;
+	public void setCiudad(Ciudad ciudad) {
+		this.ciudad = ciudad;
 	}
+	
+	
 }
