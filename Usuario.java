@@ -1,35 +1,34 @@
-package Modelo;
+package modelo;
 
 public class Usuario {
-
-	private String idUsuario;
+	
+	private int idUsuario;
 	private String nombre;
 	private String apellido;
 	private String mail;
 	private String nombreUsuario;
-	private String contraseña;
-	private Tipo tipoUsuario;
+	private String contrasenia;
+	private Tipo_Rol tipo_rol;
 	
 	public Usuario() {
 	}
-
-	public Usuario(String idUsuario, String nombre, String apellido, String mail, String nombreUsuario,
-			String contraseña, Tipo tipoUsuario) {
-		super();
-		this.idUsuario = idUsuario;
+	
+	public Usuario(int id, String nombre, String apellido, String mail, String nombreUsuario,
+			String contrasenia) {
+		this.idUsuario = id;
 		this.nombre = nombre;
 		this.apellido = apellido;
 		this.mail = mail;
 		this.nombreUsuario = nombreUsuario;
-		this.contraseña = contraseña;
-		this.tipoUsuario = tipoUsuario;
+		this.contrasenia = contrasenia;
 	}
 
-	public String getIdUsuario() {
+
+	public int getIdUsuario() {
 		return idUsuario;
 	}
 
-	public void setIdUsuario(String idUsuario) {
+	public void setIdUsuario(int idUsuario) {
 		this.idUsuario = idUsuario;
 	}
 
@@ -65,19 +64,21 @@ public class Usuario {
 		this.nombreUsuario = nombreUsuario;
 	}
 
-	public String getContraseña() {
-		return contraseña;
+	public String getContrasenia() {
+		return contrasenia;
 	}
 
-	public void setContraseña(String contraseña) {
-		this.contraseña = contraseña;
+	public void setContrasenia(String contrasenia) {
+		this.contrasenia = contrasenia;
 	}
 
-	public Tipo getTipoUsuario() {
-		return tipoUsuario;
+	public Tipo_Rol getTipo_rol() {
+		return tipo_rol;
 	}
 
-	public void setTipoUsuario(Tipo tipoUsuario) {
-		this.tipoUsuario = tipoUsuario;
+	public void setTipo_rol(Tipo_Rol tipo_rol) {
+		this.tipo_rol = tipo_rol;
 	}
+	
+	
 }
