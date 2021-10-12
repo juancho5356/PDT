@@ -12,6 +12,7 @@ import vista_desplegables.*;
 import java.awt.SystemColor;
 import java.awt.Color;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import javax.swing.ImageIcon;
 import java.awt.Font;
@@ -20,12 +21,13 @@ import javax.swing.JDesktopPane;
 import javax.swing.SwingConstants;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.sql.SQLException;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Cursor;
 
-public class Principal extends JFrame implements MouseListener, MouseMotionListener, ActionListener {
+public class Principal extends JFrame implements MouseListener, MouseMotionListener{
 
 	/**
 	 * 
@@ -46,9 +48,10 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 	private JButton btnCrearNuevoFormulario;
 	private JButton btnListarFormularios;
 	private JLabel lblGestinDeEstaciones;
-	private JButton btnCrearNuevaEstacion;
 	private JButton btnListarEstaciones;
 	private JButton btnCrearNuevaCasilla;
+	public  JLabel lblNombreUser;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -65,6 +68,17 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 		});
 	}
 	int xMouse, yMouse; 
+
+	String u = AltaUsuario.Usuario;
+	String lu = Listado_Usuarios.Listado_Usuario;
+	
+	String f = AltaFormulario.Alta_Formulario;
+	String lf = Listado_Formularios.Listado_Formularios;
+	
+	String es = AltaEstacion.Alta_Estacion;
+	String le = Listado_Estaciones.Listado_Estaciones;
+	
+	String c = AltaCasilla.Alta_Casilla;
 	
 	public static JDesktopPane principal;
 	/**
@@ -92,13 +106,59 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 		
 		btnCrearUsuario = new JButton("Crear nuevo Usuario");
 		btnCrearUsuario.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btnCrearUsuario.addActionListener(this);
 		btnCrearUsuario.setHorizontalAlignment(SwingConstants.LEADING);
 		btnCrearUsuario.setForeground(new Color(192, 192, 192));
 		btnCrearUsuario.setFont(new Font("Baskerville Old Face", Font.PLAIN, 14));
 		btnCrearUsuario.setBackground(new Color(128, 128, 128));
 		btnCrearUsuario.setBounds(0, 134, 349, 32);
 		sidePane.add(btnCrearUsuario);
+
+		AltaUsuario creaUsuario = new AltaUsuario();
+		Listado_Estaciones listadoEsta = new Listado_Estaciones();
+		Listado_Usuarios listadoUsuario = new Listado_Usuarios();
+		AltaFormulario creaForm = new AltaFormulario();
+		Listado_Formularios listadoform = new Listado_Formularios();
+		AltaCasilla creaCasilla = new AltaCasilla();
+
+
+		btnCrearUsuario.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				
+				if(u==null) { 
+					if(!creaUsuario.isVisible() || !creaUsuario.isValid()) {
+						principal.add(creaUsuario);
+						creaUsuario.setVisible(true);	
+					}
+				}
+				if(listadoEsta.isVisible()) {
+					principal.remove(listadoEsta);
+					listadoEsta.setVisible(false);
+					le=null;
+				}
+				if(listadoUsuario.isVisible()) {
+					principal.remove(listadoUsuario);
+					listadoUsuario.setVisible(false);
+					lu=null;
+				}
+				if(creaForm.isVisible()) {
+					principal.remove(creaForm);
+					creaForm.setVisible(false);
+					f=null;
+				}
+				if(listadoform.isVisible()) {
+					principal.remove(listadoform);
+					listadoform.setVisible(false);
+					lf=null;
+				}
+				if(creaCasilla.isVisible()) {
+					principal.remove(creaCasilla);
+					creaCasilla.setVisible(false);
+					c=null;
+				}
+			}
+
+		});
 		
 		lblGestionUsuarios = new JLabel("Gestion de Usuarios");
 		lblGestionUsuarios.setFont(new Font("Baskerville Old Face", Font.PLAIN, 18));
@@ -132,13 +192,50 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 		
 		btnListarUsuarios = new JButton("Listar Usuarios");
 		btnListarUsuarios.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btnListarUsuarios.addActionListener(this);
 		btnListarUsuarios.setHorizontalAlignment(SwingConstants.LEADING);
 		btnListarUsuarios.setForeground(Color.LIGHT_GRAY);
 		btnListarUsuarios.setFont(new Font("Baskerville Old Face", Font.PLAIN, 14));
 		btnListarUsuarios.setBackground(Color.GRAY);
 		btnListarUsuarios.setBounds(0, 167, 349, 32);
 		sidePane.add(btnListarUsuarios);
+		btnListarUsuarios.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				if(lu==null) {
+					if(!listadoUsuario.isVisible() || !listadoUsuario.isValid()) {
+						principal.add(listadoUsuario);
+						listadoUsuario.setVisible(true);
+					}
+					
+				}
+				if(listadoEsta.isVisible()) {
+					principal.remove(listadoEsta);
+					listadoEsta.setVisible(false);
+					le=null;
+				}
+				if(creaUsuario.isVisible()) {
+					principal.remove(creaUsuario);
+					creaUsuario.setVisible(false);
+					u=null;
+				}
+				if(creaForm.isVisible()) {
+					principal.remove(creaForm);
+					creaForm.setVisible(false);
+					f=null;
+				}
+				if(listadoform.isVisible()) {
+					principal.remove(listadoform);
+					listadoform.setVisible(false);
+					lf=null;
+				}
+				if(creaCasilla.isVisible()) {
+					principal.remove(creaCasilla);
+					creaCasilla.setVisible(false);
+					c=null;
+				}
+			}
+			
+		});
 		
 		lblGestionDeFormularios = new JLabel("Gestion de Formularios");
 		lblGestionDeFormularios.setForeground(Color.WHITE);
@@ -147,7 +244,6 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 		sidePane.add(lblGestionDeFormularios);
 		
 		btnCrearNuevoFormulario = new JButton("Crear nuevo Formulario");
-		btnCrearNuevoFormulario.addActionListener(this);
 		btnCrearNuevoFormulario.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnCrearNuevoFormulario.setHorizontalAlignment(SwingConstants.LEADING);
 		btnCrearNuevoFormulario.setForeground(Color.LIGHT_GRAY);
@@ -155,9 +251,47 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 		btnCrearNuevoFormulario.setBackground(Color.GRAY);
 		btnCrearNuevoFormulario.setBounds(0, 251, 349, 32);
 		sidePane.add(btnCrearNuevoFormulario);
+		btnCrearNuevoFormulario.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				
+				if(f==null) {
+					if(!creaForm.isVisible() || !creaForm.isValid()) {
+						principal.add(creaForm);
+						creaForm.setVisible(true);
+					}
+					
+				}
+				if(listadoEsta.isVisible()) {
+					principal.remove(listadoEsta);
+					listadoEsta.setVisible(false);
+					le=null;
+				}
+				if(creaUsuario.isVisible()) {
+					principal.remove(creaUsuario);
+					creaUsuario.setVisible(false);
+					u=null;
+				}
+				if(listadoUsuario.isVisible()) {
+					principal.remove(listadoUsuario);
+					listadoUsuario.setVisible(false);
+					lu=null;
+				}
+				if(listadoform.isVisible()) {
+					principal.remove(listadoform);
+					listadoform.setVisible(false);
+					lf=null;
+				}
+				if(creaCasilla.isVisible()) {
+					principal.remove(creaCasilla);
+					creaCasilla.setVisible(false);
+					c=null;
+				}
+			}
+			
+		});
 		
 		btnListarFormularios = new JButton("Listar Formularios");
-		btnListarFormularios.addActionListener(this);
 		btnListarFormularios.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnListarFormularios.setHorizontalAlignment(SwingConstants.LEADING);
 		btnListarFormularios.setForeground(Color.LIGHT_GRAY);
@@ -165,6 +299,45 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 		btnListarFormularios.setBackground(Color.GRAY);
 		btnListarFormularios.setBounds(0, 284, 349, 32);
 		sidePane.add(btnListarFormularios);
+		btnListarFormularios.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				if(lf==null) {
+					if(!listadoform.isVisible() || !listadoform.isValid()) {
+						principal.add(listadoform);
+						listadoform.setVisible(true);
+					}
+					
+				}
+
+				if(listadoEsta.isVisible()) {
+					principal.remove(listadoEsta);
+					listadoEsta.setVisible(false);
+					le=null;
+				}
+				if(creaUsuario.isVisible()) {
+					principal.remove(creaUsuario);
+					creaUsuario.setVisible(false);
+					u=null;
+				}
+				if(listadoUsuario.isVisible()) {
+					principal.remove(listadoUsuario);
+					listadoUsuario.setVisible(false);
+					lu=null;
+				}
+				if(creaForm.isVisible()) {
+					principal.remove(creaForm);
+					creaForm.setVisible(false);
+					f=null;
+				}
+				if(creaCasilla.isVisible()) {
+					principal.remove(creaCasilla);
+					creaCasilla.setVisible(false);
+					c=null;
+				}
+			}
+			
+		});
 		
 		lblGestinDeEstaciones = new JLabel("Gesti\u00F3n de Estaciones de Medici\u00F3n");
 		lblGestinDeEstaciones.setForeground(Color.WHITE);
@@ -172,28 +345,58 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 		lblGestinDeEstaciones.setBounds(10, 359, 297, 46);
 		sidePane.add(lblGestinDeEstaciones);
 		
-		btnCrearNuevaEstacion = new JButton("Crear nueva Estaci\u00F3n");
-		btnCrearNuevaEstacion.addActionListener(this);
-		btnCrearNuevaEstacion.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		btnCrearNuevaEstacion.setHorizontalAlignment(SwingConstants.LEADING);
-		btnCrearNuevaEstacion.setForeground(Color.LIGHT_GRAY);
-		btnCrearNuevaEstacion.setFont(new Font("Baskerville Old Face", Font.PLAIN, 14));
-		btnCrearNuevaEstacion.setBackground(Color.GRAY);
-		btnCrearNuevaEstacion.setBounds(0, 404, 349, 32);
-		sidePane.add(btnCrearNuevaEstacion);
-		
 		btnListarEstaciones = new JButton("Listar Estaciones");
-		btnListarEstaciones.addActionListener(this);
 		btnListarEstaciones.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnListarEstaciones.setHorizontalAlignment(SwingConstants.LEADING);
 		btnListarEstaciones.setForeground(Color.LIGHT_GRAY);
 		btnListarEstaciones.setFont(new Font("Baskerville Old Face", Font.PLAIN, 14));
 		btnListarEstaciones.setBackground(Color.GRAY);
-		btnListarEstaciones.setBounds(0, 437, 349, 32);
+		btnListarEstaciones.setBounds(0, 404, 349, 32);
 		sidePane.add(btnListarEstaciones);
+
+		btnListarEstaciones.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				
+				if(le==null) {
+					if(!listadoEsta.isVisible() || !listadoEsta.isValid()) {
+						principal.add(listadoEsta);
+						listadoEsta.setVisible(true);
+					}
+
+					
+				}
+				if(creaUsuario.isVisible()) {
+					principal.remove(creaUsuario);
+					creaUsuario.setVisible(false);
+					u=null;
+				}
+				if(listadoUsuario.isVisible()) {
+					principal.remove(listadoUsuario);
+					listadoUsuario.setVisible(false);
+					lu=null;
+				}
+				if(creaForm.isVisible()) {
+					principal.remove(creaForm);
+					creaForm.setVisible(false);
+					f=null;
+				}
+				if(creaCasilla.isVisible()) {
+					principal.remove(creaCasilla);
+					creaCasilla.setVisible(false);
+					c=null;
+				}
+				if(listadoform.isVisible()) {
+					principal.remove(listadoform);
+					listadoform.setVisible(false);
+					lf=null;
+				}
+				
+			}
+			
+		});
 		
 		btnCrearNuevaCasilla = new JButton("Crear nueva Casilla");
-		btnCrearNuevaCasilla.addActionListener(this);
 		btnCrearNuevaCasilla.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnCrearNuevaCasilla.setHorizontalAlignment(SwingConstants.LEADING);
 		btnCrearNuevaCasilla.setForeground(Color.LIGHT_GRAY);
@@ -201,6 +404,50 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 		btnCrearNuevaCasilla.setBackground(Color.GRAY);
 		btnCrearNuevaCasilla.setBounds(0, 317, 349, 32);
 		sidePane.add(btnCrearNuevaCasilla);
+		btnCrearNuevaCasilla.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				if(c==null) {
+					if(!creaCasilla.isVisible() || !creaCasilla.isValid()) {
+						principal.add(creaCasilla);
+						creaCasilla.setVisible(true);
+					}
+					
+				}
+				if(creaUsuario.isVisible()) {
+					principal.remove(creaUsuario);
+					creaUsuario.setVisible(false);
+					u=null;
+				}
+				if(listadoUsuario.isVisible()) {
+					principal.remove(listadoUsuario);
+					listadoUsuario.setVisible(false);
+					lu=null;
+				}
+				if(creaForm.isVisible()) {
+					principal.remove(creaForm);
+					creaForm.setVisible(false);
+					f=null;
+				}
+				if(listadoEsta.isVisible()) {
+					principal.remove(listadoEsta);
+					listadoEsta.setVisible(false);
+					le=null;
+				}
+				if(listadoform.isVisible()) {
+					principal.remove(listadoform);
+					listadoform.setVisible(false);
+					lf=null;
+				}
+			}
+			
+		});
+		
+		lblNombreUser = new JLabel("");
+		lblNombreUser.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblNombreUser.setForeground(SystemColor.inactiveCaption);
+		lblNombreUser.setBounds(77, 10, 230, 32);
+		sidePane.add(lblNombreUser);
 		
 		barra = new JPanel();
 		barra.setBounds(0, 0, 1335, 68);
@@ -217,7 +464,20 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 	}
 	public void mouseClicked(MouseEvent e) {
 		if (e.getSource() == btnCerrarSesion) {
-			mouseClickedBtnCerrarSesion(e);
+			try {
+				mouseClickedBtnCerrarSesion(e);
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+	protected void mouseClickedBtnCerrarSesion(MouseEvent e) throws SQLException {
+		int respuesta = JOptionPane.showConfirmDialog(this, "¿ Realmente quieres cerrar sesión ?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if(respuesta == JOptionPane.YES_OPTION) {
+			
+			LogIn ventana = new LogIn();
+			ventana.setVisible(true);
+			dispose(); 
 		}
 	}
 	public void mouseEntered(MouseEvent e) {
@@ -248,103 +508,4 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 		this.setLocation(x - xMouse, y - yMouse);
 	}
 	
-	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == btnCrearNuevaCasilla) {
-			actionPerformedBtnCrearNuevaCasilla(e);
-		}
-		if (e.getSource() == btnListarEstaciones) {
-			actionPerformedBtnListarEstaciones(e);
-		}
-		
-		if (e.getSource() == btnListarFormularios) {
-			actionPerformedBtnListarFormularios(e);
-		}
-		if (e.getSource() == btnCrearNuevoFormulario) {
-			actionPerformedBtnCrearNuevoFormulario(e);
-		}
-		if (e.getSource() == btnListarUsuarios) {
-			actionPerformedBtnListarUsuarios(e);
-		}
-		if (e.getSource() == btnCrearUsuario) {
-			actionPerformedBtnCrearUsuario(e);
-		}
-		
-		if (e.getSource() == btnCrearNuevaEstacion) {
-			actionPerformedBtnCrearNuevaEstacion(e);
-		}
-	}
-	
-	String u = AltaUsuario.Usuario;
-	String l = Listado_Usuarios.Listado_Usuario;
-	
-	String f = AltaFormulario.Alta_Formulario;
-	String lf = Listado_Formularios.Listado_Formularios;
-	
-	String es = AltaEstacion.Alta_Estacion;
-	String le = Listado_Estaciones.Listado_Estaciones;
-	
-	String c = AltaCasilla.Alta_Casilla;
-	
-	
-	private void actionPerformedBtnCrearNuevaEstacion(ActionEvent e) {
-		
-		if(es==null) {
-			AltaEstacion creaEstacion = new AltaEstacion();
-			principal.add(creaEstacion);
-			creaEstacion.setVisible(true);
-		}
-	}
-	protected void actionPerformedBtnCrearUsuario(ActionEvent e) {
-		
-		if(u==null) {
-			AltaUsuario creaUsuario = new AltaUsuario();
-			principal.add(creaUsuario);
-			creaUsuario.setVisible(true);
-		}
-		
-	}
-	protected void mouseClickedBtnCerrarSesion(MouseEvent e) {
-		System.exit(0);
-	}
-	
-	protected void actionPerformedBtnListarUsuarios(ActionEvent e) {
-		
-		if(l==null) {
-			Listado_Usuarios listadoUsuario = new Listado_Usuarios();
-			principal.add(listadoUsuario);
-			listadoUsuario.setVisible(true);
-		}
-	}
-	protected void actionPerformedBtnCrearNuevoFormulario(ActionEvent e) {
-		
-		if(f==null) {
-			AltaFormulario creaForm = new AltaFormulario();
-			principal.add(creaForm);
-			creaForm.setVisible(true);
-		}
-	}
-	protected void actionPerformedBtnListarFormularios(ActionEvent e) {
-		
-		if(lf==null) {
-			Listado_Formularios listadoform = new Listado_Formularios();
-			principal.add(listadoform);
-			listadoform.setVisible(true);
-		}
-	}
-	protected void actionPerformedBtnListarEstaciones(ActionEvent e) {
-		
-		if(le==null) {
-			Listado_Estaciones listadoEsta = new Listado_Estaciones();
-			principal.add(listadoEsta);
-			listadoEsta.setVisible(true);
-		}
-	}
-	protected void actionPerformedBtnCrearNuevaCasilla(ActionEvent e) {
-		
-		if(c==null) {
-			AltaCasilla creaCasilla = new AltaCasilla();
-			principal.add(creaCasilla);
-			creaCasilla.setVisible(true);
-		}
-	}
 }
