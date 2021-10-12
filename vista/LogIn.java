@@ -7,11 +7,17 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import java.awt.Color;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+
+import databaseManager.DAO_Administrador;
+import databaseManager.DAO_Aficionado;
+import databaseManager.DAO_Investigador;
+import modelo.*;
 import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
@@ -20,6 +26,8 @@ import javax.swing.JSeparator;
 import javax.swing.JButton;
 import java.awt.Cursor;
 import java.awt.event.MouseListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 
@@ -35,9 +43,9 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 	private JPanel panel;
 	private JLabel IniciarSesion;
 	private JLabel lblUsuario;
-	private JTextField textUsuario;
+	public static JTextField textUsuario;
 	private JLabel lblContrasenia;
-	private JPasswordField password;
+	public static JPasswordField password;
 	private JSeparator separator;
 	private JSeparator separator_1;
 	private JButton btnIngresar;
@@ -45,8 +53,8 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 	private JPanel barra;
 	
 	
-	
-	
+	public static String LogIn;
+
 	/**
 	 * Launch the application.
 	 */
@@ -161,6 +169,55 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 		btnIngresar.setBackground(SystemColor.controlHighlight);
 		btnIngresar.setBounds(85, 372, 130, 42);
 		panel.add(btnIngresar);
+		btnIngresar.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				if(!(textUsuario.getText().isEmpty() || String.valueOf(password.getPassword()).isEmpty() || textUsuario.getText().equals("Ingrese Nombre de Usuario") ||String.valueOf(password.getPassword()).equals("********"))) {
+					
+					
+					Administrador admin= DAO_Administrador.findAdministrador(textUsuario.getText(), String.valueOf(password.getPassword()));
+					Investigador inves = DAO_Investigador.findInvestigador(textUsuario.getText(), String.valueOf(password.getPassword()));
+					Aficionado afic = DAO_Aficionado.findAficionado(textUsuario.getText(), String.valueOf(password.getPassword()));
+					
+					if(admin!=null) {
+						if(admin.getTipo_rol().equals(Tipo_Rol.ADMINISTRADOR)) {
+							JOptionPane.showMessageDialog(null, "Welcome " + admin.getNombre()+" "+ admin.getApellido() + " !");
+							
+							Principal ventana = new Principal();
+							ventana.lblNombreUser.setText(admin.getNombre()+" "+ admin.getApellido());
+							ventana.setVisible(true);
+							dispose();
+						}
+					}
+					else if(inves!=null) {
+						if(inves.getTipo_rol().equals(Tipo_Rol.INVESTIGADOR)) {
+							JOptionPane.showMessageDialog(null, "Welcome " + inves.getNombre()+" "+ inves.getApellido() + " !");
+							
+							Principal_Investigador ventana = new Principal_Investigador();
+							ventana.lblNombreUser.setText(inves.getNombre()+" "+ inves.getApellido());
+							ventana.setVisible(true);
+							dispose();
+						}
+					}
+					else if(afic!=null) {
+						if(afic.getTipo_rol().equals(Tipo_Rol.AFICIONADO)) {
+							JOptionPane.showMessageDialog(null, "Welcome " + afic.getNombre()+" "+ afic.getApellido() + " !");
+							/*
+							Principal ventana = new Principal();
+							ventana.lblNombreUser.setText(admin.getNombre()+" "+ admin.getApellido());
+							ventana.setVisible(true);
+							dispose();*/
+						}
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "Nombre de usuario y/o contraseña incorrectos: no existe el usuario en el sistema");
+					}
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Por favor, complete ambos campos para poder ingresar al sistema");
+				}
+			}			
+		});
 		
 		barra = new JPanel();
 		barra.addMouseMotionListener(this);
