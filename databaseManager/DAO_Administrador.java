@@ -1,16 +1,56 @@
-package databaseManager;
+package Controlador;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import modelo.*;
+import Modelo.Administrador;
+import Modelo.*;
 
 public class DAO_Administrador {
 	private static final String INSERT_ADMINISTRADOR = "INSERT INTO administradores (ID_administrador, DOCUMENTO, DOMICILIO, TELEFONO, ID_USUARIO, ID_CIUDAD) VALUES (SEQ_ID_ADMINISTRADOR.nextval, ?,?,?,?,?)";
-	private static final String BUSCAR_ADMINISTRADOR= "SELECT * FROM administradores a INNER JOIN usuarios u ON a.id_usuario = u.id_usuario WHERE u.nombre_usuario= ? AND u.\"CONTRASEÑA\"= ?";
+	private static final String BUSCAR_ADMINISTRADOR= "SELECT * FROM administradores a INNER JOIN usuarios u ON a.id_usuario = u.id_usuario WHERE u.usuario= ? AND u.\"CONTRASEÑA\"= ?";
 	private static final String BUSCAR_ADMINISTRADOR_ID= "SELECT * FROM administradores WHERE ID_ADMINISTRADOR = ?";
 	private static final String BUSCAR_ADMINISTRADOR_CEDULA= "SELECT * FROM administradores WHERE DOCUMENTO = ?";
+	private static final String UPDATE_ADMINISTRADOR = "UPDATE ADMINISTRADORES SET DOCUMENTO = ?, DOMICILIO = ?, TELEFONO = ? WHERE ID_ADMINISTRADOR = ?";
+	private static final String DELETE_ADMINISTRADOR = "DELETE FROM ADMINISTRADORES WHERE ID_ADMINISTRADOR = ?";
+	
+	public static boolean delete(Administrador a) {
+		try {
+			
+			PreparedStatement statement = DatabaseManager.getConnection().prepareStatement(DELETE_ADMINISTRADOR);
+			
+			statement.setInt(1, a.getIdAdministrador());
+			
+			int Retorno = statement.executeUpdate();
+			
+			return Retorno > 0;
+		
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	public static boolean edit(Administrador a, String idAdministrador) {
+		
+		try{
+			PreparedStatement statement = DatabaseManager.getConnection().prepareStatement(UPDATE_ADMINISTRADOR);
+			
+			statement.setLong(1, a.getDocumento());
+			statement.setString(2, a.getDomicilio());
+			statement.setLong(3, a.getTelefono());
+			statement.setLong(4, a.getIdAdministrador());
+			
+			int Retorno = statement.executeUpdate();
+			
+			return Retorno > 0;
+		
+		}catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}	 
+	}
 
 		public static boolean insert(Administrador a) {
 			try {
@@ -110,7 +150,7 @@ public class DAO_Administrador {
 			
 			Administrador admin = new Administrador(u.getIdUsuario(),u.getNombre(), u.getApellido(), u.getMail(), u.getNombreUsuario(), u.getContrasenia(), id, doc, dom, t, c);
 			admin.setIdAdministrador(id);;
-			admin.setTipo_rol(Tipo_Rol.ADMINISTRADOR);
+			admin.setTipo_rol(Tipo.ADMINISTRADOR);
 			
 			return admin;
 		}

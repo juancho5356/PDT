@@ -1,17 +1,35 @@
-package databaseManager;
+package Controlador;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
-import modelo.Ciudad;
+import Modelo.Ciudad;
 
 public class DAO_Ciudad {
 	
 	private static final String ALL_CIUDADES = "SELECT * FROM CIUDADES ORDER BY 2"; 
 	private static final String CIUDAD_ID = "SELECT * FROM CIUDADES WHERE ID_CIUDAD = ?"; 
 	private static final String CIUDAD_NOMBRE = "SELECT * FROM CIUDADES WHERE NOMBRE = ?"; 
+	private static final String INSERT_CIUDAD = "INSERT INTO CIUDADES (ID_CIUDAD, NOMBRE) VALUES (SEQ_ID_CIUDAD.NEXTVAL, ?)";
+	
+	public static boolean insert(Ciudad c) {
+		
+		try {
+			PreparedStatement statement = DatabaseManager.getConnection().prepareStatement(INSERT_CIUDAD);
+			
+			statement.setString(1, c.getNombre());
+			
+			int Retorno = statement.executeUpdate();
+			
+			return Retorno > 0;
+		
+		}catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
 
 	public static Ciudad findCiudad(int id) {
 		
