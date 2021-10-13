@@ -1,4 +1,4 @@
-package vista;
+package Vista.vista;
 
 import java.awt.EventQueue;
 import java.awt.Image;
@@ -14,10 +14,8 @@ import java.awt.Color;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
-import databaseManager.DAO_Administrador;
-import databaseManager.DAO_Aficionado;
-import databaseManager.DAO_Investigador;
-import modelo.*;
+import Controlador.*;
+import Modelo.*;
 import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
@@ -88,7 +86,7 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 				
-		ImageIcon image2 = new ImageIcon(getClass().getResource("/image/fondo.jpg"));
+		ImageIcon image2 = new ImageIcon(getClass().getResource("/Vista/image/fondo.jpg"));
 		
 		panel = new JPanel();
 		panel.setBackground(SystemColor.control);
@@ -118,6 +116,7 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 		panel.add(IniciarSesion);
 		
 		lblFondo = new JLabel("");
+		lblFondo.setIcon(new ImageIcon(LogIn.class.getResource("/Vista/image/fondo.jpg")));
 		lblFondo.setBounds(581, -12, 386, 550);
 		panel.add(lblFondo);
 		lblFondo.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -127,7 +126,6 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 				lblFondo.getHeight(),
 				Image.SCALE_DEFAULT
 		));
-		lblFondo.setIcon(fondo2);
 		
 		lblUsuario = new JLabel("Usuario");
 		lblUsuario.setFont(new Font("Baskerville Old Face", Font.PLAIN, 20));
@@ -180,8 +178,8 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 					Aficionado afic = DAO_Aficionado.findAficionado(textUsuario.getText(), String.valueOf(password.getPassword()));
 					
 					if(admin!=null) {
-						if(admin.getTipo_rol().equals(Tipo_Rol.ADMINISTRADOR)) {
-							JOptionPane.showMessageDialog(null, "Welcome " + admin.getNombre()+" "+ admin.getApellido() + " !");
+						if(admin.getTipo().equals(Tipo.ADMINISTRADOR)) {
+							JOptionPane.showMessageDialog(null, "Bienvenido " + admin.getNombre()+" "+ admin.getApellido() + "!");
 							
 							Principal ventana = new Principal();
 							ventana.lblNombreUser.setText(admin.getNombre()+" "+ admin.getApellido());
@@ -190,27 +188,27 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 						}
 					}
 					else if(inves!=null) {
-						if(inves.getTipo_rol().equals(Tipo_Rol.INVESTIGADOR)) {
-							JOptionPane.showMessageDialog(null, "Welcome " + inves.getNombre()+" "+ inves.getApellido() + " !");
+						if(inves.getTipo().equals(Tipo.INVESTIGADOR)) {
+							JOptionPane.showMessageDialog(null, "Bienvenido " + inves.getNombre()+" "+ inves.getApellido() + " !");
 							
-							Principal_Investigador ventana = new Principal_Investigador();
+							Principal ventana = new Principal();
 							ventana.lblNombreUser.setText(inves.getNombre()+" "+ inves.getApellido());
 							ventana.setVisible(true);
 							dispose();
 						}
 					}
 					else if(afic!=null) {
-						if(afic.getTipo_rol().equals(Tipo_Rol.AFICIONADO)) {
-							JOptionPane.showMessageDialog(null, "Welcome " + afic.getNombre()+" "+ afic.getApellido() + " !");
-							/*
+						if(afic.getTipo().equals(Tipo.AFICIONADO)) {
+							JOptionPane.showMessageDialog(null, "Bienvenido " + afic.getNombre()+" "+ afic.getApellido() + " !");
+							
 							Principal ventana = new Principal();
-							ventana.lblNombreUser.setText(admin.getNombre()+" "+ admin.getApellido());
+							ventana.lblNombreUser.setText(afic.getNombre()+" "+ afic.getApellido());
 							ventana.setVisible(true);
-							dispose();*/
+							dispose();
 						}
 					}
 					else {
-						JOptionPane.showMessageDialog(null, "Nombre de usuario y/o contraseÃ±a incorrectos: no existe el usuario en el sistema");
+						JOptionPane.showMessageDialog(null, "Nombre de usuario y/o contraseña incorrectos: no existe el usuario en el sistema");
 					}
 				}
 				else {

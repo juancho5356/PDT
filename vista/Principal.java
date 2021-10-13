@@ -1,4 +1,4 @@
-package vista;
+package Vista.vista;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import vista_desplegables.*;
+import Vista.vista_desplegables.*;
 
 import java.awt.SystemColor;
 import java.awt.Color;
@@ -167,7 +167,7 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 		sidePane.add(lblGestionUsuarios);
 		
 		lblUser = new JLabel("");
-		lblUser.setIcon(new ImageIcon(Principal.class.getResource("/image/user.png")));
+		lblUser.setIcon(new ImageIcon(Principal.class.getResource("/Vista/image/user.png")));
 		lblUser.setBounds(20, 0, 52, 68);
 		sidePane.add(lblUser);
 		
@@ -472,7 +472,7 @@ public class Principal extends JFrame implements MouseListener, MouseMotionListe
 		}
 	}
 	protected void mouseClickedBtnCerrarSesion(MouseEvent e) throws SQLException {
-		int respuesta = JOptionPane.showConfirmDialog(this, "Â¿ Realmente quieres cerrar sesiÃ³n ?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		int respuesta = JOptionPane.showConfirmDialog(this, "¿Realmente quieres cerrar sesión?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if(respuesta == JOptionPane.YES_OPTION) {
 			
 			LogIn ventana = new LogIn();
