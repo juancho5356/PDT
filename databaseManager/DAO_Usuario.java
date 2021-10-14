@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.List;
 
 import Modelo.Usuario;
 
@@ -13,9 +14,61 @@ public class DAO_Usuario {
 	private static final String INSERT_USUARIO = "INSERT INTO Usuarios (ID_USUARIO, NOMBRE, APELLIDO, USUARIO, MAIL, CONTRASEÑA) VALUES (SEQ_ID_USUARIO.nextval, ?,?,?,?,?)";
 	private static final String BUSCAR_USUARIO_ID= "SELECT * FROM USUARIOS WHERE ID_USUARIO = ?";
 	private static final String BUSCAR_USUARIO_MAIL= "SELECT * FROM USUARIOS WHERE MAIL = ?";
-	private static final String UPDATE_USUARIO = "UPDATE USUARIOS SET NOMBRE = ?, APELLIDO = ?, USUARI0 = ?, MAIL = ?, CONTRASEÑA = ? WHERE ID_USUARIO = ?";
+	private static final String BUSCAR_USUARIO_NOMBRE = "SELECT * FROM USUARIOS WHERE NOMBRE = ?";
+	private static final String BUSCAR_USUARIO_APELLIDO = "SELECT * FROM USUARIOS WHERE APELLIDO = ?";
+	private static final String UPDATE_USUARIO = "UPDATE USUARIOS SET NOMBRE = ?, APELLIDO = ?, MAIL = ? WHERE ID_USUARIO = ?";
 	private static final String ALL_USUARIOS = "SELECT * FROM USUARIOS ORDER BY 1";
 	private static final String DELETE_USUARIO = "DELETE FROM USUARIOS WHERE ID_USUARIO = ?";
+	
+	public static LinkedList<Usuario> findUsuarioapellido(String apellido) {
+		LinkedList<Usuario> usuarios = new LinkedList<>();
+		
+		try {
+			PreparedStatement statement = DatabaseManager.getConnection().prepareStatement(BUSCAR_USUARIO_APELLIDO);
+			
+			statement.setString(1, apellido);
+			
+			ResultSet resultado = statement.executeQuery();
+			
+			Usuario user = null;
+			
+			while(resultado.next()) {
+				user = getUsuarioFromResultSet(resultado);
+				usuarios.add(user);
+			}
+			return usuarios;
+			
+		}catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+	
+	public static LinkedList<Usuario> findUsuarioNombre(String nombre) {
+		LinkedList<Usuario> usuarios = new LinkedList<>();
+		
+		try {
+			PreparedStatement statement = DatabaseManager.getConnection().prepareStatement(BUSCAR_USUARIO_NOMBRE);
+			
+			statement.setString(1, nombre);
+			
+			ResultSet resultado = statement.executeQuery();
+			
+			Usuario user = null;
+			
+			while(resultado.next()) {
+				user = getUsuarioFromResultSet(resultado);
+				usuarios.add(user);
+			}
+			return usuarios;
+			
+		}catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
 	
 	public static LinkedList<Usuario> findAll(){
 		LinkedList<Usuario> usuarios = new LinkedList<>();
@@ -61,10 +114,8 @@ public class DAO_Usuario {
 		
 		statement.setString(1, u.getNombre());
 		statement.setString(2, u.getApellido());
-		statement.setString(3, u.getNombreUsuario());
-		statement.setString(4, u.getMail());
-		statement.setString(5, u.getContrasenia());
-		statement.setLong(6, u.getIdUsuario());
+		statement.setString(3, u.getMail());
+		statement.setLong(4, u.getIdUsuario());
 		
 		int Retorno = statement.executeUpdate();
 		
