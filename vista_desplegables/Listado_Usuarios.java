@@ -42,6 +42,13 @@ public class Listado_Usuarios extends JPanel {
 	public static String Listado_Usuario;
 	private JTextField textFieldId;
 	private JTable table;
+	private JTextField textNombre;
+	private JTextField textApellido;
+	private JTextField textRol;
+	private JTextField textNombreMod;
+	private JTextField textIdMod;
+	private JTextField textApellidoMod;
+	private JTextField textMailMod;
 
 	
 	/**
@@ -61,22 +68,22 @@ public class Listado_Usuarios extends JPanel {
 		
 		JLabel lblListaDeUsuarios = new JLabel("Lista de Usuarios");
 		lblListaDeUsuarios.setFont(new Font("Baskerville Old Face", Font.ITALIC, 27));
-		lblListaDeUsuarios.setBounds(38, 46, 275, 31);
+		lblListaDeUsuarios.setBounds(10, 10, 275, 31);
 		panel.add(lblListaDeUsuarios);
 		
 		JLabel lblNewLabel = new JLabel("Ingrese un ID");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblNewLabel.setBounds(687, 591, 88, 21);
+		lblNewLabel.setBounds(364, 591, 88, 21);
 		panel.add(lblNewLabel);
 		
 		textFieldId = new JTextField();
 		textFieldId.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		textFieldId.setBounds(785, 592, 53, 19);
+		textFieldId.setBounds(462, 592, 53, 19);
 		panel.add(textFieldId);
 		textFieldId.setColumns(10);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(34, 105, 921, 457);
+		scrollPane.setBounds(20, 169, 617, 393);
 		panel.add(scrollPane);
 		
 		table = new JTable();
@@ -91,7 +98,7 @@ public class Listado_Usuarios extends JPanel {
 		
 		JButton btnEliminar = new JButton("Eliminar");
 		btnEliminar.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnEliminar.setBounds(848, 591, 107, 21);
+		btnEliminar.setBounds(525, 591, 107, 21);
 		panel.add(btnEliminar);
 		
 		DefaultTableModel modelo= new DefaultTableModel();
@@ -105,8 +112,141 @@ public class Listado_Usuarios extends JPanel {
 		
 		JButton btnNewButton = new JButton("Actualizar listado");
 		btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnNewButton.setBounds(34, 593, 152, 21);
+		btnNewButton.setBounds(20, 591, 152, 21);
 		panel.add(btnNewButton);
+		
+		JLabel lblNewLabel_1 = new JLabel("Nombre");
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblNewLabel_1.setBounds(20, 51, 81, 21);
+		panel.add(lblNewLabel_1);
+		
+		textNombre = new JTextField();
+		textNombre.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		textNombre.setBounds(140, 51, 204, 22);
+		panel.add(textNombre);
+		textNombre.setColumns(10);
+		
+		JLabel lblNewLabel_2 = new JLabel("Apellido");
+		lblNewLabel_2.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblNewLabel_2.setBounds(20, 85, 75, 19);
+		panel.add(lblNewLabel_2);
+		
+		textApellido = new JTextField();
+		textApellido.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		textApellido.setBounds(140, 83, 204, 22);
+		panel.add(textApellido);
+		textApellido.setColumns(10);
+		
+		JLabel lblNewLabel_3 = new JLabel("Rol de usuario");
+		lblNewLabel_3.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblNewLabel_3.setBounds(20, 116, 107, 17);
+		panel.add(lblNewLabel_3);
+		
+		textRol = new JTextField();
+		textRol.setBounds(140, 116, 204, 22);
+		panel.add(textRol);
+		textRol.setColumns(10);
+		
+		JButton btnBuscar = new JButton("Buscar");
+		btnBuscar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnBuscar.setBounds(451, 109, 139, 31);
+		panel.add(btnBuscar);
+		
+		JPanel panel_1 = new JPanel();
+		panel_1.setBounds(647, 0, 338, 658);
+		panel.add(panel_1);
+		panel_1.setLayout(null);
+		
+		JLabel lblListaDeUsuarios = new JLabel("Lista de Usuarios");
+		lblListaDeUsuarios.setFont(new Font("Baskerville Old Face", Font.ITALIC, 27));
+		lblListaDeUsuarios.setBounds(10, 10, 275, 31);
+		panel_1.add(lblListaDeUsuarios);
+		
+		JLabel lblNewLabel_4 = new JLabel("Nombre");
+		lblNewLabel_4.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblNewLabel_4.setBounds(22, 156, 86, 17);
+		panel_1.add(lblNewLabel_4);
+		
+		textNombreMod = new JTextField();
+		textNombreMod.setBounds(94, 154, 218, 26);
+		panel_1.add(textNombreMod);
+		textNombreMod.setColumns(10);
+		
+		JLabel lblNewLabel_5 = new JLabel("ID");
+		lblNewLabel_5.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblNewLabel_5.setBounds(56, 93, 60, 17);
+		panel_1.add(lblNewLabel_5);
+		
+		textIdMod = new JTextField();
+		textIdMod.setColumns(10);
+		textIdMod.setBounds(94, 91, 218, 26);
+		panel_1.add(textIdMod);
+		
+		JLabel lblNewLabel_6 = new JLabel("Apellido");
+		lblNewLabel_6.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblNewLabel_6.setBounds(29, 221, 79, 17);
+		panel_1.add(lblNewLabel_6);
+		
+		textApellidoMod = new JTextField();
+		textApellidoMod.setColumns(10);
+		textApellidoMod.setBounds(94, 219, 218, 26);
+		panel_1.add(textApellidoMod);
+		
+		JLabel lblNewLabel_7 = new JLabel("Mail");
+		lblNewLabel_7.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		lblNewLabel_7.setBounds(48, 288, 68, 17);
+		panel_1.add(lblNewLabel_7);
+		
+		textMailMod = new JTextField();
+		textMailMod.setColumns(10);
+		textMailMod.setBounds(94, 286, 218, 26);
+		panel_1.add(textMailMod);
+		
+		JButton btnLimpiar = new JButton("Limpiar");
+		btnLimpiar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnLimpiar.setBounds(18, 368, 98, 31);
+		panel_1.add(btnLimpiar);
+		
+		
+		JButton btnAceptar = new JButton("Aceptar");
+		btnAceptar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnAceptar.setBounds(214, 368, 98, 31);
+		panel_1.add(btnAceptar);
+		
+		JButton btnLimpiarFiltros = new JButton("Limpiar filtros");
+		btnLimpiarFiltros.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnLimpiarFiltros.setBounds(451, 53, 139, 31);
+		panel.add(btnLimpiarFiltros);
+		btnLimpiarFiltros.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				textNombre.setText("");
+				textApellido.setText("");
+				textRol.setText("");
+			}
+		});
+		
+		btnAceptar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String idST = textIdMod.getText();
+				String nombre = textNombreMod.getText();
+				String apellido = textApellidoMod.getText();
+				String mail = textMailMod.getText();
+
+				Usuario u = new Usuario();
+				u.setNombre(nombre);
+				u.setApellido(apellido);
+				u.setMail(mail);
+
+				if(DAO_Usuario.edit(u, idST)) {
+					JOptionPane.showConfirmDialog(null, "¿Desea actualizar el usuario con los datos ingresados?");
+					JOptionPane.showMessageDialog(null, "Usuario actualizado con éxito");
+					lista();
+				}else {
+					JOptionPane.showMessageDialog(null, "No se ha podido actualizar el usuario");
+				}
+			}
+		});
+		
 		LinkedList<Usuario> todosUsuarios = DAO_Usuario.findAll();
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -126,6 +266,9 @@ public class Listado_Usuarios extends JPanel {
 			fila[2] = apellido;
 			fila[3] = mail;
 			modelo.addRow(fila);
+			
+		
+		
 			
 		btnEliminar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -150,6 +293,7 @@ public class Listado_Usuarios extends JPanel {
 					
 					Usuario u = DAO_Usuario.findUsuarioId(id);
 					if(DAO_Usuario.delete(u)) {
+						JOptionPane.showConfirmDialog(null, "¿Desea eliminar completamente el usuario seleccionado?");
 						JOptionPane.showMessageDialog(null, "Usuario eliminado exitosamente");
 						textFieldId.setText("");
 						lista();
@@ -164,6 +308,15 @@ public class Listado_Usuarios extends JPanel {
 				}*/
 		}
 		});
+		
+		btnLimpiar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				textIdMod.setText("");
+				textNombreMod.setText("");
+				textApellidoMod.setText("");
+				textMailMod.setText("");
+			}
+		});
+		}
 	}
-}
 }
