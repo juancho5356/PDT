@@ -121,7 +121,7 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 			
 			DefaultTableModel modelo= new DefaultTableModel();
 			
-			Object[] columns = {"Nombre","Fecha","Hora","Ubicación","Usuario"};
+			Object[] columns = {"ID","Nombre","Fecha","Hora","Ubicación","Usuario"};
 			
 			modelo.setColumnIdentifiers(columns);
 			table.setModel(modelo);
@@ -129,6 +129,9 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 
 
 	public void mouseClicked(MouseEvent e) {
+		if (e.getSource() == table) {
+			mouseClickedTable(e);
+		}
 	}
 	public void mousePressed(MouseEvent e) {
 	}
@@ -137,5 +140,23 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 	public void mouseEntered(MouseEvent e) {
 	}
 	public void mouseExited(MouseEvent e) {
+	}
+	
+	public void mouseClickedTable(MouseEvent e) {
+		limpiar();
+		
+		int filaSeleccionada;
+		
+		
+		filaSeleccionada = table.getSelectedRow();
+		if(filaSeleccionada == -1) {
+			
+		}else {
+			textIdEliminar.setText(table.getValueAt(filaSeleccionada, 0).toString());
+		}
+	}
+	
+	public void limpiar() {
+		textIdEliminar.setText("");
 	}
 }
