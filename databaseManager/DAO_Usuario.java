@@ -115,7 +115,7 @@ public class DAO_Usuario {
 		statement.setString(1, u.getNombre());
 		statement.setString(2, u.getApellido());
 		statement.setString(3, u.getMail());
-		statement.setLong(4, u.getIdUsuario());
+		statement.setString(4, idUsuario);
 		
 		int Retorno = statement.executeUpdate();
 		
