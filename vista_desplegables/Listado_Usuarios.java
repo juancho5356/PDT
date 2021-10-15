@@ -6,7 +6,9 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.time.LocalDate;
 import java.util.LinkedList;
 
 import javax.swing.JPanel;
@@ -31,7 +33,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.border.LineBorder;
 
-public class Listado_Usuarios extends JPanel {
+public class Listado_Usuarios extends JPanel implements MouseListener {
 	
 	/**
 	 * 
@@ -88,6 +90,7 @@ public class Listado_Usuarios extends JPanel {
 		
 		table = new JTable();
 		table.setSurrendersFocusOnKeystroke(true);
+		table.addMouseListener(this);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane.setViewportView(table);
 		
@@ -157,9 +160,9 @@ public class Listado_Usuarios extends JPanel {
 		panel.add(panel_1);
 		panel_1.setLayout(null);
 		
-		JLabel lblListaDeUsuarios = new JLabel("Lista de Usuarios");
+		JLabel lblListaDeUsuarios = new JLabel("Modificaci\u00F3n de Usuarios");
 		lblListaDeUsuarios.setFont(new Font("Baskerville Old Face", Font.ITALIC, 27));
-		lblListaDeUsuarios.setBounds(10, 10, 275, 31);
+		lblListaDeUsuarios.setBounds(10, 10, 318, 31);
 		panel_1.add(lblListaDeUsuarios);
 		
 		JLabel lblNewLabel_4 = new JLabel("Nombre");
@@ -319,4 +322,68 @@ public class Listado_Usuarios extends JPanel {
 		});
 		}
 	}
+		
+		
+		public void mouseClicked(MouseEvent e) {
+			if (e.getSource() == table) {
+				mouseClickedTable(e);
+			}
+		}
+		public void mouseEntered(MouseEvent e) {
+		}
+		public void mouseExited(MouseEvent e) {
+		}
+		public void mousePressed(MouseEvent e) {
+		}
+		public void mouseReleased(MouseEvent e) {
+		}
+		public void mouseClickedTable(MouseEvent e) {
+			limpiar();
+			
+			int filaSeleccionada;
+			
+			
+			filaSeleccionada = table.getSelectedRow();
+			if(filaSeleccionada == -1) {
+
+			}else {
+					
+					textIdMod.setText(table.getValueAt(filaSeleccionada, 0 ).toString());
+					textNombreMod.setText(table.getValueAt(filaSeleccionada, 1 ).toString());
+					textApellidoMod.setText(table.getValueAt(filaSeleccionada, 2 ).toString());
+					textMailMod.setText(table.getValueAt(filaSeleccionada, 3).toString());
+					
+					textFieldId.setText(table.getValueAt(filaSeleccionada, 0).toString());
+					
+					if (!((table.getValueAt(filaSeleccionada, 0 ))== null)) {
+						textIdMod.setText(table.getValueAt(filaSeleccionada, 0 ).toString());
+					}else {
+						textIdMod.setText("");
+					}
+					if(!((table.getValueAt(filaSeleccionada, 1)) == null)) {
+						textNombreMod.setText(table.getValueAt(filaSeleccionada, 1).toString());
+					}else {
+						textNombreMod.setText("");
+					}
+					if(!((table.getValueAt(filaSeleccionada, 2)) == null)) {
+						textApellidoMod.setText(table.getValueAt(filaSeleccionada, 2).toString());
+					}else {
+						textApellidoMod.setText("");
+					}
+					if(!((table.getValueAt(filaSeleccionada, 3)) == null)) {
+						textMailMod.setText(table.getValueAt(filaSeleccionada, 3).toString());
+					}else {
+						textMailMod.setText("");
+					}
+			}
+
+		}
+		
+		public void limpiar() {
+			
+			textIdMod.setText("");
+			textNombreMod.setText("");
+			textApellidoMod.setText("");
+			textMailMod.setText("");
+		}
 }
