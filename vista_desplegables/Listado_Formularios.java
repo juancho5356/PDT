@@ -1,4 +1,4 @@
-package vista_desplegables;
+package Vista.vista_desplegables;
 
 import java.awt.CardLayout;
 import java.awt.Color;

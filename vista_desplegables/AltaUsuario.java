@@ -1,4 +1,4 @@
-package vista_desplegables;
+package Vista.vista_desplegables;
 
 import javax.swing.JPanel;
 import java.awt.Rectangle;
@@ -6,7 +6,7 @@ import java.awt.Color;
 import java.awt.CardLayout;
 import javax.swing.JTextField;
 
-import databaseManager.*;
+import Controlador.*;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -29,7 +29,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 
-import modelo.*;
+import Modelo.*;
 import javax.swing.SwingConstants;
 import javax.swing.JSeparator;
 
@@ -211,7 +211,7 @@ public class AltaUsuario extends JPanel{
 			
 		});
 		
-		lblCorreoElectrnico = new JLabel("Correo electr\u00F3nico");
+		lblCorreoElectrnico = new JLabel("Correo electrónico");
 		lblCorreoElectrnico.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
 		lblCorreoElectrnico.setBounds(55, 264, 170, 25);
 		panel.add(lblCorreoElectrnico);
@@ -466,9 +466,9 @@ public class AltaUsuario extends JPanel{
 		comboBox.addItem("");
 		
 		LinkedList<String> allRoles = new LinkedList<>();
-		allRoles.add(modelo.Tipo_Rol.AFICIONADO.name());
-		allRoles.add(modelo.Tipo_Rol.ADMINISTRADOR.name());
-		allRoles.add(modelo.Tipo_Rol.INVESTIGADOR.name());
+		allRoles.add(Modelo.Tipo.AFICIONADO.name());
+		allRoles.add(Modelo.Tipo.ADMINISTRADOR.name());
+		allRoles.add(Modelo.Tipo.INVESTIGADOR.name());
 
 		for (String s: allRoles){
 			comboBox.addItem(s);
@@ -522,14 +522,14 @@ public class AltaUsuario extends JPanel{
 									limpiar();
 								}
 								else {
-									JOptionPane.showMessageDialog(null, "No es posible aÃ±adir este Investigador");
+									JOptionPane.showMessageDialog(null, "No es posible añadir este Investigador");
 								}
 							}
 							else {
-								JOptionPane.showMessageDialog(null, "No es posible aÃ±adir este registro");
+								JOptionPane.showMessageDialog(null, "No es posible añadir este registro");
 							}
 						}catch(Exception ex) {
-							JOptionPane.showMessageDialog(null, "No es posible aÃ±adir este registro");
+							JOptionPane.showMessageDialog(null, "No es posible añadir este registro");
 						}
 					}
 					else if(comboBox.getSelectedItem().equals("ADMINISTRADOR")) {	
@@ -544,14 +544,14 @@ public class AltaUsuario extends JPanel{
 									limpiar();
 								}
 								else {
-									JOptionPane.showMessageDialog(null, "No es posible aÃ±adir este Administrador");
+									JOptionPane.showMessageDialog(null, "No es posible añadir este Administrador");
 								}
 							}
 							else {
-								JOptionPane.showMessageDialog(null, "No es posible aÃ±adir este registro");
+								JOptionPane.showMessageDialog(null, "No es posible añadir este registro");
 							}
 						}catch(Exception ex) {
-							JOptionPane.showMessageDialog(null, "No es posible aÃ±adir este registro");
+							JOptionPane.showMessageDialog(null, "No es posible añadir este registro");
 						}
 					}
 				}
@@ -570,14 +570,14 @@ public class AltaUsuario extends JPanel{
 								limpiar();
 							}
 							else {
-								JOptionPane.showMessageDialog(null, "No es posible aÃ±adir este Aficionado");
+								JOptionPane.showMessageDialog(null, "No es posible añadir este Aficionado");
 							}
 						}
 						else {
-							JOptionPane.showMessageDialog(null, "No es posible aÃ±adir este registro");
+							JOptionPane.showMessageDialog(null, "No es posible añadir este registro");
 						}
 					}catch(Exception ex) {
-						JOptionPane.showMessageDialog(null, "No es posible aÃ±adir este registro");
+						JOptionPane.showMessageDialog(null, "No es posible añadir este registro");
 					}
 				}
 				
@@ -598,7 +598,7 @@ public class AltaUsuario extends JPanel{
 				if(isLetra(validar, e) == false) {
 					e.consume();
 					
-					JOptionPane.showMessageDialog(null, "La ocupaciÃ³n debe contener solo letras");
+					JOptionPane.showMessageDialog(null, "La ocupación debe contener solo letras");
 					
 					ocupacion = false;
 
@@ -627,7 +627,7 @@ public class AltaUsuario extends JPanel{
 			
 		});;
 
-		lblOcupacion = new JLabel("OcupaciÃ³n");
+		lblOcupacion = new JLabel("Ocupación");
 		lblOcupacion.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
 		lblOcupacion.setBounds(530, 156, 170, 25);
 		panel.add(lblOcupacion);
@@ -647,7 +647,7 @@ public class AltaUsuario extends JPanel{
 				if(isNumero(validar, evt) == false) {
 					evt.consume();
 					
-					JOptionPane.showMessageDialog(null, "CÃ©dula debe contener solo nÃºmeros");
+					JOptionPane.showMessageDialog(null, "Cédula debe contener solo números");
 					
 					cedula = false;
 
@@ -673,7 +673,7 @@ public class AltaUsuario extends JPanel{
 					int ci = Integer.parseInt(textCedula.getText());
 					if(existeInveAdmin(ci)) {
 						cedula = false;
-						JOptionPane.showMessageDialog(null, "La CÃ©dula ingresada ya existe en el sistema!");
+						JOptionPane.showMessageDialog(null, "La Cédula ingresada ya existe en el sistema!");
 					}
 					else {
 						cedula = true;
@@ -703,7 +703,7 @@ public class AltaUsuario extends JPanel{
 					int ci = Integer.parseInt(textCedula.getText());
 					if(existeInveAdmin(ci)) {
 						cedula = false;
-						JOptionPane.showMessageDialog(null, "La CÃ©dula ingresada ya existe en el sistema!");
+						JOptionPane.showMessageDialog(null, "La Cédula ingresada ya existe en el sistema!");
 						textCedula.setText("");
 					}
 					else {
@@ -719,7 +719,7 @@ public class AltaUsuario extends JPanel{
 		});
 		
 		
-		lblCedula = new JLabel("C\u00E9dula");
+		lblCedula = new JLabel("Cédula");
 		lblCedula.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
 		lblCedula.setBounds(530, 156, 170, 25);
 		panel.add(lblCedula);
@@ -744,7 +744,7 @@ public class AltaUsuario extends JPanel{
 				if(isNumero(validar, evt) == false) {
 					evt.consume();
 					
-					JOptionPane.showMessageDialog(null, "TelÃ©fono debe contener solo nÃºmeros");
+					JOptionPane.showMessageDialog(null, "Teléfono debe contener solo números");
 					lblCampoTelefono.setForeground(Color.RED);
 
 					telefono = false;
@@ -771,7 +771,7 @@ public class AltaUsuario extends JPanel{
 
 			}
 		});
-		lblTelefono = new JLabel("Tel\u00E9fono");
+		lblTelefono = new JLabel("Teléfono");
 		lblTelefono.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
 		lblTelefono.setBounds(530, 319, 170, 25);
 		panel.add(lblTelefono);
@@ -862,7 +862,7 @@ public class AltaUsuario extends JPanel{
 				}
 				else {
 					e.consume();
-					JOptionPane.showMessageDialog(null, "El domicilio puede contener: letras y nÃºmeros");
+					JOptionPane.showMessageDialog(null, "El domicilio puede contener: letras y números");
 					
 					domicilio = false;
 				}
@@ -907,7 +907,7 @@ public class AltaUsuario extends JPanel{
 		btnLimpiar.setBounds(710, 523, 170, 49);
 		panel.add(btnLimpiar);
 		
-		lblCampoCedula = new JLabel("C\u00E9dula sin puntos o guiones. Formato: 12345678");
+		lblCampoCedula = new JLabel("Cédula sin puntos o guiones. Formato: 12345678");
 		lblCampoCedula.setFont(new Font("Baskerville Old Face", Font.PLAIN, 12));
 		lblCampoCedula.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblCampoCedula.setForeground(Color.GRAY);
@@ -915,7 +915,7 @@ public class AltaUsuario extends JPanel{
 		panel.add(lblCampoCedula);
 		lblCampoCedula.setVisible(false);
 
-		lblCampoTelefono = new JLabel("Tel\u00E9fono solo num\u00E9rico");
+		lblCampoTelefono = new JLabel("Teléfono solo numérico");
 		lblCampoTelefono.setFont(new Font("Baskerville Old Face", Font.PLAIN, 12));
 		lblCampoTelefono.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblCampoTelefono.setForeground(Color.GRAY);
@@ -923,7 +923,7 @@ public class AltaUsuario extends JPanel{
 		panel.add(lblCampoTelefono);
 		lblCampoTelefono.setVisible(false);
 		
-		lblCampoNombreUsuario = new JLabel("Usuario solo con caracteres no num\u00E9ricos");
+		lblCampoNombreUsuario = new JLabel("Usuario solo con caracteres no numéricos");
 		lblCampoNombreUsuario.setFont(new Font("Baskerville Old Face", Font.PLAIN, 12));
 		lblCampoNombreUsuario.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblCampoNombreUsuario.setForeground(Color.GRAY);
@@ -958,7 +958,7 @@ public class AltaUsuario extends JPanel{
 		panel.add(lblCaracteresUsuario);
 		lblCaracteresUsuario.setVisible(false);
 
-		lblCampoPassword = new JLabel("Contrase\u00F1a debe contener solo n\u00FAmeros y letras");
+		lblCampoPassword = new JLabel("Contraseña debe contener solo números y letras");
 		lblCampoPassword.setHorizontalAlignment(SwingConstants.TRAILING);
 		lblCampoPassword.setForeground(Color.GRAY);
 		lblCampoPassword.setFont(new Font("Baskerville Old Face", Font.PLAIN, 12));
