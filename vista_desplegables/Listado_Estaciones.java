@@ -1,4 +1,4 @@
-package vista_desplegables;
+package Vista.vista_desplegables;
 
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -20,11 +20,8 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.table.DefaultTableModel;
 
-import databaseManager.DAO_Departamento;
-import databaseManager.DAO_Estacion_Medicion;
-import modelo.Departamento;
-import modelo.Estacion_Medicion;
-import modelo.Investigador;
+import Controlador.*;
+import Modelo.*;
 import javax.swing.JComboBox;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;

@@ -1,4 +1,4 @@
-package vista_desplegables;
+package Vista.vista_desplegables;
 
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -24,8 +24,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import databaseManager.*;
-import modelo.*;
+import Controlador.*;
+import Modelo.*;
 
 import java.awt.Font;
 import javax.swing.JTextField;
@@ -195,7 +195,7 @@ public class Listado_Usuarios extends JPanel {
 
 						@Override
 						public void mouseClicked(MouseEvent e) {
-							int respuesta = JOptionPane.showConfirmDialog(null, "Â¿ Realmente quieres eliminar a este usuario ? Una vez hecho, no hay vuelta atrÃ¡s", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+							int respuesta = JOptionPane.showConfirmDialog(null, "¿Realmente quieres eliminar a este usuario? Una vez hecho, no hay vuelta atrás", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 							if(respuesta == JOptionPane.YES_OPTION) {
 								if(tipo_usuario.equals("ADMINISTRADOR")) {
 									if(DAO_Administrador.delete(adm)) {
@@ -290,7 +290,7 @@ public class Listado_Usuarios extends JPanel {
 		panel.add(panel_1);
 		panel_1.setLayout(null);
 		
-		lblInformacionUsuario = new JLabel("Informaci\u00F3n de Usuario");
+		lblInformacionUsuario = new JLabel("Información de Usuario");
 		lblInformacionUsuario.setHorizontalAlignment(SwingConstants.CENTER);
 		lblInformacionUsuario.setFont(new Font("Baskerville Old Face", Font.ITALIC, 27));
 		lblInformacionUsuario.setBounds(0, 60, 338, 31);
@@ -456,9 +456,9 @@ public class Listado_Usuarios extends JPanel {
 		panel_1.add(comboBox_Rol2);
 		
 		LinkedList<String> allRoles = new LinkedList<>();
-		allRoles.add(modelo.Tipo_Rol.AFICIONADO.name());
-		allRoles.add(modelo.Tipo_Rol.ADMINISTRADOR.name());
-		allRoles.add(modelo.Tipo_Rol.INVESTIGADOR.name());
+		allRoles.add(Modelo.Tipo.AFICIONADO.name());
+		allRoles.add(Modelo.Tipo.ADMINISTRADOR.name());
+		allRoles.add(Modelo.Tipo.INVESTIGADOR.name());
 
 		for (String s: allRoles){
 			comboBox_Rol2.addItem(s);
@@ -482,7 +482,7 @@ public class Listado_Usuarios extends JPanel {
 				if(isNumero(validar, evt) == false) {
 					evt.consume();
 					
-					JOptionPane.showMessageDialog(null, "TelÃ©fono debe contener solo nÃºmeros");
+					JOptionPane.showMessageDialog(null, "Teléfono debe contener solo números");
 					lblCampoTelefono.setForeground(Color.RED);
 
 					telefono = false;
@@ -527,7 +527,7 @@ public class Listado_Usuarios extends JPanel {
 				}
 				else {
 					e.consume();
-					JOptionPane.showMessageDialog(null, "El domicilio puede contener: letras y nÃºmeros");
+					JOptionPane.showMessageDialog(null, "El domicilio puede contener: letras y números");
 					
 					domicilio = false;
 				}
@@ -557,13 +557,13 @@ public class Listado_Usuarios extends JPanel {
 		panel_1.add(lblDomicilio);
 		lblDomicilio.setVisible(false);
 		
-		lblCedula = new JLabel("C\u00E9dula");
+		lblCedula = new JLabel("Cédula");
 		lblCedula.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
 		lblCedula.setBounds(10, 347, 170, 25);
 		panel_1.add(lblCedula);
 		lblCedula.setVisible(false);
 		
-		lblTelefono = new JLabel("Tel\u00E9fono");
+		lblTelefono = new JLabel("Teléfono");
 		lblTelefono.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
 		lblTelefono.setBounds(10, 510, 170, 25);
 		panel_1.add(lblTelefono);
@@ -601,7 +601,7 @@ public class Listado_Usuarios extends JPanel {
 				if(isLetra(validar, e) == false) {
 					e.consume();
 					
-					JOptionPane.showMessageDialog(null, "La ocupaciÃ³n debe contener solo letras");
+					JOptionPane.showMessageDialog(null, "La ocupación debe contener solo letras");
 					
 					ocupacion = false;
 
@@ -630,7 +630,7 @@ public class Listado_Usuarios extends JPanel {
 			
 		});;
 		
-		lblOcupacion = new JLabel("Ocupaci\u00F3n");
+		lblOcupacion = new JLabel("Ocupación");
 		lblOcupacion.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
 		lblOcupacion.setBounds(10, 347, 170, 25);
 		panel_1.add(lblOcupacion);
@@ -641,13 +641,70 @@ public class Listado_Usuarios extends JPanel {
 		btnActualizarUsuario.setBackground(new Color(173, 216, 230));
 		btnActualizarUsuario.setBounds(10, 563, 318, 31);
 		panel_1.add(btnActualizarUsuario);
-		btnActualizarUsuario.setEnabled(false);;
+		btnActualizarUsuario.setEnabled(true);
 		btnActualizarUsuario.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				
+				int filaSeleccionada;
+				
+				filaSeleccionada = table.getSelectedRow();
+				if(filaSeleccionada == -1) {
+					elsee();
+				}
+				String tipo_usuario = table.getValueAt(filaSeleccionada, 4).toString();
+				
+				if(tipo_usuario.equals("ADMINISTRADOR")) {
+					Administrador a = new Administrador();
+					a.setNombre(textNombre.getText());
+					a.setApellido(textApellido.getText());
+					a.setMail(textCorreo.getText());
+					String cedulaST = textCedula.getText();
+					int cedula = Integer.parseInt(cedulaST);
+					a.setDocumento(cedula);
+					String ciudadST = comboBox_Ciudad.getSelectedItem().toString();
+					Ciudad c = new Ciudad();
+					c.setNombre(ciudadST);
+					a.setCiudad(c);
+					a.setDomicilio(textDomicilio.getText());
+					String telefonoST = textTelefono.getText();
+					int telefono = Integer.parseInt(telefonoST);
+					a.setTelefono(telefono);
+					Usuario u = DAO_Usuario.findUsuarioMail(textCorreo.getText());
+					int id = u.getIdUsuario();
+					
+					int respuesta = JOptionPane.showConfirmDialog(null, "¿Realmente quieres actualizar los datos de este usuario?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+					if(respuesta == JOptionPane.YES_OPTION) {
+					DAO_Usuario.edit(a, id);
+					if(DAO_Usuario.edit(a, id)) {
+						JOptionPane.showMessageDialog(null, "Usuario actualizado correctamente");
+						listarTodo();
+					}else {
+						JOptionPane.showMessageDialog(null, "No se ha podido actualizar los datos del usuario");
+					}
+					}
+					
+				}
+				
+				if(tipo_usuario.equals("INVESTIGADOR")) {
+					Investigador i = new Investigador();
+					i.setNombre(textNombre.getText());
+					i.setApellido(textApellido.getText());
+					i.setMail(textCorreo.getText());
+					String cedulaST = textCedula.getText();
+					int cedula = Integer.parseInt(cedulaST);
+					i.setDocumento(cedula);
+					String ciudadST = comboBox_Ciudad.getSelectedItem().toString();
+					Ciudad c = new Ciudad();
+					c.setNombre(ciudadST);
+					i.setCiudad(c);
+					i.setDomicilio(textDomicilio.getText());
+					String telefonoST = textTelefono.getText();
+					int telefono = Integer.parseInt(telefonoST);
+					i.setTelefono(telefono);
+					
+				}
 			}
 			
 		});
@@ -666,7 +723,7 @@ public class Listado_Usuarios extends JPanel {
 		lblCampoCorreo.setBounds(53, 210, 275, 19);
 		panel_1.add(lblCampoCorreo);
 
-		lblCampoCedula = new JLabel("C\u00E9dula sin puntos o guiones. Formato: 12345678");
+		lblCampoCedula = new JLabel("Cédula sin puntos o guiones. Formato: 12345678");
 		lblCampoCedula.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblCampoCedula.setForeground(Color.GRAY);
 		lblCampoCedula.setFont(new Font("Baskerville Old Face", Font.PLAIN, 12));
@@ -674,7 +731,7 @@ public class Listado_Usuarios extends JPanel {
 		panel_1.add(lblCampoCedula);
 		lblCampoCedula.setVisible(false);
 
-		lblCampoTelefono = new JLabel("Tel\u00E9fono solo num\u00E9rico");
+		lblCampoTelefono = new JLabel("Teléfono solo numérico");
 		lblCampoTelefono.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblCampoTelefono.setForeground(Color.GRAY);
 		lblCampoTelefono.setFont(new Font("Baskerville Old Face", Font.PLAIN, 12));
@@ -739,7 +796,7 @@ public class Listado_Usuarios extends JPanel {
 				if(isNumero(validar, evt) == false) {
 					evt.consume();
 					
-					JOptionPane.showMessageDialog(null, "CÃ©dula debe contener solo nÃºmeros");
+					JOptionPane.showMessageDialog(null, "Cédula debe contener solo números");
 					
 					cedula = false;
 
@@ -884,7 +941,7 @@ public class Listado_Usuarios extends JPanel {
 						if(!textFiltro.getText().isEmpty()) {
 							String n = textFiltro.getText();
 							
-							usuarios = DAO_Usuario.findUsuarioNombreUsuario(n);
+							usuarios = DAO_Usuario.findUsuarioNombre(n);
 							if(usuarios.size() != 0) {
 								listarUsuario(usuarios, fila,  model, null);
 							}
@@ -905,13 +962,13 @@ public class Listado_Usuarios extends JPanel {
 							usuarios = DAO_Usuario.findAll();
 							
 							if(comboBox_Rol.getSelectedItem().equals("ADMINISTRADOR")) {
-								listarUsuario(usuarios, fila,  model, Tipo_Rol.ADMINISTRADOR);
+								listarUsuario(usuarios, fila,  model, Tipo.ADMINISTRADOR);
 							}
 							else if (comboBox_Rol.getSelectedItem().equals("INVESTIGADOR")) {
-								listarUsuario(usuarios, fila,  model,  Tipo_Rol.INVESTIGADOR);
+								listarUsuario(usuarios, fila,  model,  Tipo.INVESTIGADOR);
 							}
 							else if(comboBox_Rol.getSelectedItem().equals("AFICIONADO")) {
-								listarUsuario(usuarios, fila,  model,  Tipo_Rol.AFICIONADO);
+								listarUsuario(usuarios, fila,  model,  Tipo.AFICIONADO);
 							}
 						}
 					}
@@ -964,7 +1021,7 @@ public class Listado_Usuarios extends JPanel {
 			comboBox_Rol.addItem(s);
 		} 
 		
-		lblSeleccione = new JLabel("Seleccione un registro para realizar alguna modificaci\u00F3n, eliminacion o para ver los datos completos del mismo");
+		lblSeleccione = new JLabel("Seleccione un registro para realizar alguna modificación, eliminacion o para ver los datos completos del mismo");
 		lblSeleccione.setHorizontalAlignment(SwingConstants.TRAILING);
 		lblSeleccione.setFont(new Font("Arial", Font.PLAIN, 10));
 		lblSeleccione.setForeground(Color.DARK_GRAY);
@@ -993,7 +1050,7 @@ public class Listado_Usuarios extends JPanel {
 		
 	}
 
-	public void listarUsuario(LinkedList<Usuario> usuarios, Object[] fila, DefaultTableModel model, Tipo_Rol tipo) {
+	public void listarUsuario(LinkedList<Usuario> usuarios, Object[] fila, DefaultTableModel model, Tipo tipo) {
 		for (Usuario u: usuarios){
 			
 			String n = u.getNombre();
@@ -1011,14 +1068,14 @@ public class Listado_Usuarios extends JPanel {
 			
 			if(tipo == null) {
 				if(inve != null) {
-				r = inve.getTipo_rol().toString();
+				r = inve.getTipo().toString();
 				}
 				else if (admin != null) {
-					r = admin.getTipo_rol().toString();
+					r = admin.getTipo().toString();
 	
 				}
 				else if (afic != null) {
-					r = afic.getTipo_rol().toString();
+					r = afic.getTipo().toString();
 					
 				}
 				
@@ -1035,7 +1092,7 @@ public class Listado_Usuarios extends JPanel {
 					fila[1] = a;
 					fila[2] = e;
 					fila[3] = nu;
-					fila[4] = admin.getTipo_rol().toString();
+					fila[4] = admin.getTipo().toString();
 					model.addRow(fila); 
 				}	
 			}
@@ -1045,7 +1102,7 @@ public class Listado_Usuarios extends JPanel {
 					fila[1] = a;
 					fila[2] = e;
 					fila[3] = nu;
-					fila[4] = inve.getTipo_rol().toString();
+					fila[4] = inve.getTipo().toString();
 					model.addRow(fila); 
 				}	
 			}
@@ -1055,7 +1112,7 @@ public class Listado_Usuarios extends JPanel {
 					fila[1] = a;
 					fila[2] = e;
 					fila[3] = nu;
-					fila[4] = afic.getTipo_rol().toString();
+					fila[4] = afic.getTipo().toString();
 					model.addRow(fila); 
 				}	
 			}
@@ -1198,14 +1255,14 @@ public class Listado_Usuarios extends JPanel {
 			
 		
 			if(inve != null) {
-				r = inve.getTipo_rol().toString();
+				r = inve.getTipo().toString();
 			}
 			else if (admin != null) {
-				r = admin.getTipo_rol().toString();
+				r = admin.getTipo().toString();
 
 			}
 			else if (afic != null) {
-				r = afic.getTipo_rol().toString();
+				r = afic.getTipo().toString();
 				
 			}
 			

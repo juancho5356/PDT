@@ -1,4 +1,4 @@
-package vista_desplegables;
+package Vista.vista_desplegables;
 
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -9,6 +9,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import Modelo.Investigador;
+
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,11 +19,9 @@ import java.util.LinkedList;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import databaseManager.DAO_Departamento;
-import databaseManager.DAO_Estacion_Medicion;
-import databaseManager.DAO_Investigador;
-import modelo.*;
-import vista.LogIn;
+import Controlador.*;
+import Modelo.*;
+import Vista.vista.*;
 
 import javax.swing.JSeparator;
 
