@@ -656,54 +656,16 @@ public class Listado_Usuarios extends JPanel {
 				String tipo_usuario = table.getValueAt(filaSeleccionada, 4).toString();
 				
 				if(tipo_usuario.equals("ADMINISTRADOR")) {
-					Administrador a = new Administrador();
-					a.setNombre(textNombre.getText());
-					a.setApellido(textApellido.getText());
-					a.setMail(textCorreo.getText());
-					String cedulaST = textCedula.getText();
-					int cedula = Integer.parseInt(cedulaST);
-					a.setDocumento(cedula);
-					String ciudadST = comboBox_Ciudad.getSelectedItem().toString();
-					Ciudad c = new Ciudad();
-					c.setNombre(ciudadST);
-					a.setCiudad(c);
-					a.setDomicilio(textDomicilio.getText());
-					String telefonoST = textTelefono.getText();
-					int telefono = Integer.parseInt(telefonoST);
-					a.setTelefono(telefono);
-					Usuario u = DAO_Usuario.findUsuarioMail(textCorreo.getText());
-					int id = u.getIdUsuario();
-					
-					int respuesta = JOptionPane.showConfirmDialog(null, "¿Realmente quieres actualizar los datos de este usuario?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-					if(respuesta == JOptionPane.YES_OPTION) {
-					DAO_Usuario.edit(a, id);
-					if(DAO_Usuario.edit(a, id)) {
-						JOptionPane.showMessageDialog(null, "Usuario actualizado correctamente");
-						listarTodo();
-					}else {
-						JOptionPane.showMessageDialog(null, "No se ha podido actualizar los datos del usuario");
-					}
-					}
+					actualizarAdministrador();
 					
 				}
 				
 				if(tipo_usuario.equals("INVESTIGADOR")) {
-					Investigador i = new Investigador();
-					i.setNombre(textNombre.getText());
-					i.setApellido(textApellido.getText());
-					i.setMail(textCorreo.getText());
-					String cedulaST = textCedula.getText();
-					int cedula = Integer.parseInt(cedulaST);
-					i.setDocumento(cedula);
-					String ciudadST = comboBox_Ciudad.getSelectedItem().toString();
-					Ciudad c = new Ciudad();
-					c.setNombre(ciudadST);
-					i.setCiudad(c);
-					i.setDomicilio(textDomicilio.getText());
-					String telefonoST = textTelefono.getText();
-					int telefono = Integer.parseInt(telefonoST);
-					i.setTelefono(telefono);
-					
+					actualizarInvestigador();
+				}
+				
+				if(tipo_usuario.equals("AFICIONADO")) {
+					actualizarAficionado();
 				}
 			}
 			
@@ -1027,6 +989,101 @@ public class Listado_Usuarios extends JPanel {
 		lblSeleccione.setForeground(Color.DARK_GRAY);
 		lblSeleccione.setBounds(20, 144, 607, 25);
 		panel.add(lblSeleccione);
+	}
+	
+	public void actualizarAdministrador() {
+		Administrador a = new Administrador();
+		a.setNombre(textNombre.getText());
+		a.setApellido(textApellido.getText());
+		a.setMail(textCorreo.getText());
+		String cedulaST = textCedula.getText();
+		int cedula = Integer.parseInt(cedulaST);
+		a.setDocumento(cedula);
+		String ciudadST = comboBox_Ciudad.getSelectedItem().toString();
+		Ciudad c = new Ciudad();
+		c.setNombre(ciudadST);
+		a.setCiudad(c);
+		a.setDomicilio(textDomicilio.getText());
+		String telefonoST = textTelefono.getText();
+		int telefono = Integer.parseInt(telefonoST);
+		a.setTelefono(telefono);
+		Usuario u = DAO_Usuario.findUsuarioMail(textCorreo.getText());
+		int id = u.getIdUsuario();
+		Administrador adm = DAO_Administrador.findUsuarioID(id);
+		int idAdm = adm.getIdAdministrador();
+		
+		int respuesta = JOptionPane.showConfirmDialog(null, "¿Realmente quieres actualizar los datos de este usuario?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if(respuesta == JOptionPane.YES_OPTION) {
+			DAO_Usuario.edit(a, id);
+			DAO_Administrador.edit(a, idAdm);
+		if(DAO_Usuario.edit(a, id) && DAO_Administrador.edit(a, idAdm)) {
+			JOptionPane.showMessageDialog(null, "Usuario actualizado correctamente");
+			listarTodo();
+			limpiar();
+		}else {
+			JOptionPane.showMessageDialog(null, "No se ha podido actualizar los datos del usuario");
+		}
+		}
+	}
+	
+	public void actualizarInvestigador() {
+		Investigador i = new Investigador();
+		i.setNombre(textNombre.getText());
+		i.setApellido(textApellido.getText());
+		i.setMail(textCorreo.getText());
+		String cedulaST = textCedula.getText();
+		int cedula = Integer.parseInt(cedulaST);
+		i.setDocumento(cedula);
+		String ciudadST = comboBox_Ciudad.getSelectedItem().toString();
+		Ciudad c = new Ciudad();
+		c.setNombre(ciudadST);
+		i.setCiudad(c);
+		i.setDomicilio(textDomicilio.getText());
+		String telefonoST = textTelefono.getText();
+		int telefono = Integer.parseInt(telefonoST);
+		i.setTelefono(telefono);
+		Usuario u = DAO_Usuario.findUsuarioMail(textCorreo.getText());
+		int id = u.getIdUsuario();
+		Investigador inv = DAO_Investigador.findUsuarioID(id);
+		int idInv = inv.getIdInvestigador();
+		
+		int respuesta = JOptionPane.showConfirmDialog(null, "¿Realmente quieres actualizar los datos de este usuario?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if(respuesta == JOptionPane.YES_OPTION) {
+			DAO_Usuario.edit(i, id);
+			DAO_Investigador.edit(i, idInv);
+		if(DAO_Usuario.edit(i, id) && DAO_Investigador.edit(i, idInv)) {
+			JOptionPane.showMessageDialog(null, "Usuario actualizado correctamente");
+			listarTodo();
+			limpiar();
+		}else {
+			JOptionPane.showMessageDialog(null, "No se ha podido actualizar los datos del usuario");
+		}
+		}
+	}
+	
+	public void actualizarAficionado() {
+		Aficionado a = new Aficionado();
+		a.setNombre(textNombre.getText());
+		a.setApellido(textApellido.getText());
+		a.setMail(textCorreo.getText());
+		a.setOcupacion(textOcupacion.getText());
+		Usuario u = DAO_Usuario.findUsuarioMail(textCorreo.getText());
+		int id = u.getIdUsuario();
+		Aficionado afi = DAO_Aficionado.findUsuarioID(id);
+		int idAfi = afi.getIdAficionado();
+		
+		int respuesta = JOptionPane.showConfirmDialog(null, "¿Realmente quieres actualizar los datos de este usuario?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		if(respuesta == JOptionPane.YES_OPTION) {
+			DAO_Usuario.edit(a, id);
+			DAO_Aficionado.edit(a, idAfi);
+		if(DAO_Usuario.edit(a, id) && DAO_Aficionado.edit(a, idAfi)) {
+			JOptionPane.showMessageDialog(null, "Usuario actualizado correctamente");
+			listarTodo();
+			limpiar();
+		}else {
+			JOptionPane.showMessageDialog(null, "No se ha podido actualizar los datos del usuario");
+		}
+		}
 	}
 	
 	public void limpiar() {
