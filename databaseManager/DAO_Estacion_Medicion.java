@@ -1,13 +1,10 @@
-package databaseManager;
+package Controlador;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
-import modelo.Departamento;
-import modelo.Estacion_Medicion;
-import modelo.Investigador;
-
+import Modelo.*;
 
 public class DAO_Estacion_Medicion {
 	

@@ -13,6 +13,7 @@ public class DAO_Aficionado {
 	private static final String BUSCAR_AFICIONADO_ID= "SELECT * FROM aficionados WHERE ID_AFICIONADO = ?";
 	private static final String UPDATE_AFICIONADO = "UPDATE AFICIONADOS SET OCUPACION = ? WHERE ID_AFICIONADO = ?";
 	private static final String DELETE_AFICIONADO = "DELETE FROM AFICIONADOS WHERE ID_AFICIONADO = ?";
+	private static final String BUSCAR_USUARIO_ID = "SELECT * FROM AFICIONADOS WHERE ID_USUARIO = ?";
 	
 	public static boolean delete(Aficionado a) {
 		try {
@@ -31,12 +32,13 @@ public class DAO_Aficionado {
 		}
 	}
 	
-	public static boolean edit(Aficionado a, String idAficionado) {
+	public static boolean edit(Aficionado a, int idAficionado) {
 		
 		try{
 			PreparedStatement statement = DatabaseManager.getConnection().prepareStatement(UPDATE_AFICIONADO);
 			
 			statement.setString(1, a.getOcupacion());
+			statement.setInt(2, idAficionado);
 			
 			int Retorno = statement.executeUpdate();
 			
@@ -109,6 +111,31 @@ public class DAO_Aficionado {
 			}
 
 		}
+		
+		public static Aficionado findUsuarioID(int id ) {
+			
+			try {
+				PreparedStatement statement = DatabaseManager.getConnection().prepareStatement(BUSCAR_USUARIO_ID);
+				
+				statement.setLong(1, id);
+				
+				ResultSet resultado = statement.executeQuery();
+				
+				Aficionado af = null;
+				
+				while(resultado.next()) {
+					af = getAficionadoFromResultSet(resultado);
+				}
+				return af;
+				
+			}catch (SQLException e) {
+				e.printStackTrace();
+				return null;
+			}
+
+		}
+
+
 		private static Aficionado getAficionadoFromResultSet(ResultSet resultado) throws SQLException {
 			
 			int id = resultado.getInt("ID_AFICIONADO");

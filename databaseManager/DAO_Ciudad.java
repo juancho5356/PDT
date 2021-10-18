@@ -1,11 +1,11 @@
-package databaseManager;
+package Controlador;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
-import modelo.Ciudad;
+import Modelo.Ciudad;
 
 public class DAO_Ciudad {
 	

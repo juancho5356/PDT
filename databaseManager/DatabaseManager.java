@@ -1,4 +1,4 @@
-package databaseManager;
+package Controlador;
 
 import java.sql.*;
 

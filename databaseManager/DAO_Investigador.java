@@ -13,6 +13,30 @@ private static final String BUSCAR_INVESTIGADOR= "SELECT * FROM investigadores a
 private static final String BUSCAR_INVESTIGADOR_CEDULA= "SELECT * FROM investigadores WHERE DOCUMENTO = ?";
 private static final String UPDATE_INVESTIGADOR = "UPDATE INVESTIGADORES SET DOCUMENTO = ?, DOMICILIO = ?, TELEFONO = ? WHERE ID_INVESTIGADOR = ?";
 private static final String DELETE_INVESTIGADOR = "DELETE FROM INVESTIGADORES WHERE ID_INVESTIGADOR = ?";
+private static final String BUSCAR_USUARIO_ID = "SELECT * FROM INVESTIGADORES WHERE ID_USUARIO = ?";
+
+public static Investigador findUsuarioID(int id ) {
+	
+	try {
+		PreparedStatement statement = DatabaseManager.getConnection().prepareStatement(BUSCAR_USUARIO_ID);
+		
+		statement.setLong(1, id);
+		
+		ResultSet resultado = statement.executeQuery();
+		
+		Investigador in = null;
+		
+		while(resultado.next()) {
+			in = getInvestigadorFromResultSet(resultado);
+		}
+		return in;
+		
+	}catch (SQLException e) {
+		e.printStackTrace();
+		return null;
+	}
+
+}
 
 	public static boolean delete(Investigador i) {
 	try {
@@ -31,7 +55,7 @@ private static final String DELETE_INVESTIGADOR = "DELETE FROM INVESTIGADORES WH
 	}
 }
 
-	public static boolean edit(Investigador i, String idInvestigador) {
+	public static boolean edit(Investigador i, int idInvestigador) {
 	
 	try{
 		PreparedStatement statement = DatabaseManager.getConnection().prepareStatement(UPDATE_INVESTIGADOR);
@@ -39,7 +63,7 @@ private static final String DELETE_INVESTIGADOR = "DELETE FROM INVESTIGADORES WH
 		statement.setLong(1, i.getDocumento());
 		statement.setString(2, i.getDomicilio());
 		statement.setLong(3, i.getTelefono());
-		statement.setLong(4, i.getIdInvestigador());
+		statement.setInt(4, idInvestigador);
 		
 		int Retorno = statement.executeUpdate();
 		

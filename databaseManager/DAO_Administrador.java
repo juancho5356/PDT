@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import Modelo.Administrador;
 import Modelo.*;
 
 public class DAO_Administrador {
@@ -14,6 +13,30 @@ public class DAO_Administrador {
 	private static final String BUSCAR_ADMINISTRADOR_CEDULA= "SELECT * FROM administradores WHERE DOCUMENTO = ?";
 	private static final String UPDATE_ADMINISTRADOR = "UPDATE ADMINISTRADORES SET DOCUMENTO = ?, DOMICILIO = ?, TELEFONO = ? WHERE ID_ADMINISTRADOR = ?";
 	private static final String DELETE_ADMINISTRADOR = "DELETE FROM ADMINISTRADORES WHERE ID_ADMINISTRADOR = ?";
+	private static final String BUSCAR_USUARIO_ID = "SELECT * FROM ADMINISTRADORES WHERE ID_USUARIO = ?";
+	
+	public static Administrador findUsuarioID(int id ) {
+		
+		try {
+			PreparedStatement statement = DatabaseManager.getConnection().prepareStatement(BUSCAR_USUARIO_ID);
+			
+			statement.setLong(1, id);
+			
+			ResultSet resultado = statement.executeQuery();
+			
+			Administrador ad = null;
+			
+			while(resultado.next()) {
+				ad = getAdministradorFromResultSet(resultado);
+			}
+			return ad;
+			
+		}catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
 	
 	public static boolean delete(Administrador a) {
 		try {
@@ -32,7 +55,7 @@ public class DAO_Administrador {
 		}
 	}
 	
-	public static boolean edit(Administrador a, String idAdministrador) {
+	public static boolean edit(Administrador a, int idAdministrador) {
 		
 		try{
 			PreparedStatement statement = DatabaseManager.getConnection().prepareStatement(UPDATE_ADMINISTRADOR);
@@ -40,7 +63,7 @@ public class DAO_Administrador {
 			statement.setLong(1, a.getDocumento());
 			statement.setString(2, a.getDomicilio());
 			statement.setLong(3, a.getTelefono());
-			statement.setLong(4, a.getIdAdministrador());
+			statement.setLong(4, idAdministrador);
 			
 			int Retorno = statement.executeUpdate();
 			

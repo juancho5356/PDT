@@ -20,7 +20,7 @@ public class DAO_Usuario {
 	private static final String ALL_USUARIOS = "SELECT * FROM USUARIOS ORDER BY 1";
 	private static final String DELETE_USUARIO = "DELETE FROM USUARIOS WHERE ID_USUARIO = ?";
 	
-	public static LinkedList<Usuario> findUsuarioapellido(String apellido) {
+	public static LinkedList<Usuario> findUsuarioApellido(String apellido) {
 		LinkedList<Usuario> usuarios = new LinkedList<>();
 		
 		try {
@@ -107,7 +107,7 @@ public class DAO_Usuario {
 		}
 	}
 	
-	public static boolean edit(Usuario u, String idUsuario) {
+	public static boolean edit(Usuario u, int idUsuario) {
 		
 	try{
 		PreparedStatement statement = DatabaseManager.getConnection().prepareStatement(UPDATE_USUARIO);
@@ -115,7 +115,7 @@ public class DAO_Usuario {
 		statement.setString(1, u.getNombre());
 		statement.setString(2, u.getApellido());
 		statement.setString(3, u.getMail());
-		statement.setString(4, idUsuario);
+		statement.setInt(4, idUsuario);
 		
 		int Retorno = statement.executeUpdate();
 		
