@@ -1,4 +1,4 @@
-package modelo;
+package Modelo;
 
 public class Administrador extends Usuario{
 	
@@ -7,6 +7,9 @@ public class Administrador extends Usuario{
 	private String domicilio;
 	private int telefono;
 	private Ciudad ciudad;
+	
+	public Administrador() {
+	}
  	
 	public Administrador(int idUsuario, String nombre, String apellido, String mail, String nombreUsuario,
 			String contrasenia, int idAdministrador, int documento, String domicilio, int telefono, Ciudad ciudad) {

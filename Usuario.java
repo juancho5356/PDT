@@ -1,4 +1,4 @@
-package modelo;
+package Modelo;
 
 public class Usuario {
 	
@@ -8,7 +8,7 @@ public class Usuario {
 	private String mail;
 	private String nombreUsuario;
 	private String contrasenia;
-	private Tipo_Rol tipo_rol;
+	private Tipo tipo;
 	
 	public Usuario() {
 	}
@@ -72,12 +72,12 @@ public class Usuario {
 		this.contrasenia = contrasenia;
 	}
 
-	public Tipo_Rol getTipo_rol() {
-		return tipo_rol;
+	public Tipo getTipo() {
+		return tipo;
 	}
 
-	public void setTipo_rol(Tipo_Rol tipo_rol) {
-		this.tipo_rol = tipo_rol;
+	public void setTipo_rol(Tipo tipo) {
+		this.tipo = tipo;
 	}
 	
 	

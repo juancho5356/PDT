@@ -1,4 +1,4 @@
-package modelo;
+package Modelo;
 
 public class Aficionado extends Usuario{
 
@@ -20,6 +20,9 @@ public class Aficionado extends Usuario{
 		super(idUsuario,nombre, apellido, mail, nombreUsuario, contrasenia);
 
 		this.ocupacion = ocupacion;
+	}
+	
+	public Aficionado() {
 	}
 
 	public int getIdAficionado() {

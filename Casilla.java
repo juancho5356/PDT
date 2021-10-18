@@ -1,4 +1,4 @@
-package cosasSueltas;
+package Modelo;
 
 public class Casilla {
 	String id_casilla;

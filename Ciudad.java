@@ -1,9 +1,12 @@
-package modelo;
+package Modelo;
 
 public class Ciudad {
 
 	private int idCiudad;
 	private String nombre;
+	
+	public Ciudad() {
+	}
 	
 	public Ciudad(int idCiudad, String nombre) {
 		super();
