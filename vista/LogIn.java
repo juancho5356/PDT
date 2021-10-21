@@ -116,7 +116,6 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 		panel.add(IniciarSesion);
 		
 		lblFondo = new JLabel("");
-		lblFondo.setIcon(new ImageIcon(LogIn.class.getResource("/Vista/image/fondo.jpg")));
 		lblFondo.setBounds(581, -12, 386, 550);
 		panel.add(lblFondo);
 		lblFondo.setBorder(new LineBorder(new Color(0, 0, 0)));
@@ -126,6 +125,7 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 				lblFondo.getHeight(),
 				Image.SCALE_DEFAULT
 		));
+		lblFondo.setIcon(new ImageIcon(LogIn.class.getResource("/Vista/image/fondo.jpg")));
 		
 		lblUsuario = new JLabel("Usuario");
 		lblUsuario.setFont(new Font("Baskerville Old Face", Font.PLAIN, 20));
@@ -179,7 +179,7 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 					
 					if(admin!=null) {
 						if(admin.getTipo().equals(Tipo.ADMINISTRADOR)) {
-							JOptionPane.showMessageDialog(null, "Bienvenido " + admin.getNombre()+" "+ admin.getApellido() + "!");
+							JOptionPane.showMessageDialog(null, "Bienvenid@ " + admin.getNombre()+" "+ admin.getApellido() + "!");
 							
 							Principal ventana = new Principal();
 							ventana.lblNombreUser.setText(admin.getNombre()+" "+ admin.getApellido());
@@ -189,26 +189,26 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 					}
 					else if(inves!=null) {
 						if(inves.getTipo().equals(Tipo.INVESTIGADOR)) {
-							JOptionPane.showMessageDialog(null, "Bienvenido " + inves.getNombre()+" "+ inves.getApellido() + " !");
+							JOptionPane.showMessageDialog(null, "Bienvenid@ " + inves.getNombre()+" "+ inves.getApellido() + "!");
 							
-							Principal ventana = new Principal();
+							Principal_Investigador ventana = new Principal_Investigador();
 							ventana.lblNombreUser.setText(inves.getNombre()+" "+ inves.getApellido());
 							ventana.setVisible(true);
-							dispose();
+							dispose(); 
 						}
 					}
 					else if(afic!=null) {
 						if(afic.getTipo().equals(Tipo.AFICIONADO)) {
-							JOptionPane.showMessageDialog(null, "Bienvenido " + afic.getNombre()+" "+ afic.getApellido() + " !");
-							
+							JOptionPane.showMessageDialog(null, "Bienvenid@ " + afic.getNombre()+" "+ afic.getApellido() + "! (Aún no tiene menú)");
+							/*
 							Principal ventana = new Principal();
-							ventana.lblNombreUser.setText(afic.getNombre()+" "+ afic.getApellido());
+							ventana.lblNombreUser.setText(admin.getNombre()+" "+ admin.getApellido());
 							ventana.setVisible(true);
-							dispose();
+							dispose();*/
 						}
 					}
 					else {
-						JOptionPane.showMessageDialog(null, "Nombre de usuario y/o contrase�a incorrectos: no existe el usuario en el sistema");
+						JOptionPane.showMessageDialog(null, "Nombre de usuario y/o contraseña incorrectos: no existe el usuario en el sistema");
 					}
 				}
 				else {
@@ -310,3 +310,4 @@ public class LogIn extends JFrame implements MouseListener, MouseMotionListener 
 
 	}
 }
+
