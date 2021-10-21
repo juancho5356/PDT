@@ -1,4 +1,4 @@
-package vista;
+package Vista.vista;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import vista_desplegables.*;
+import Vista.vista_desplegables.*;
 
 import java.awt.SystemColor;
 import java.awt.Color;
@@ -107,7 +107,7 @@ public class Principal_Investigador extends JFrame implements MouseListener, Mou
 		sidePane.setLayout(null);
 		
 		lblUser = new JLabel("");
-		lblUser.setIcon(new ImageIcon(Principal.class.getResource("/image/user.png")));
+		lblUser.setIcon(new ImageIcon(Principal.class.getResource("/Vista/image/user.png")));
 		lblUser.setBounds(20, 0, 52, 68);
 		sidePane.add(lblUser);
 		
