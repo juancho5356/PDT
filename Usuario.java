@@ -1,5 +1,7 @@
 package Modelo;
 
+import java.util.Date;
+
 public class Usuario {
 	
 	private int idUsuario;
@@ -22,8 +24,7 @@ public class Usuario {
 		this.nombreUsuario = nombreUsuario;
 		this.contrasenia = contrasenia;
 	}
-
-
+	
 	public int getIdUsuario() {
 		return idUsuario;
 	}
@@ -79,6 +80,4 @@ public class Usuario {
 	public void setTipo_rol(Tipo tipo) {
 		this.tipo = tipo;
 	}
-	
-	
 }
