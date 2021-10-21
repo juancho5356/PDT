@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DateFormat;
@@ -23,11 +25,15 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import Controlador.DAO_Formulario;
+import Controlador.DAO_Usuario;
 import Modelo.Formulario;
+import Modelo.Tipo;
+import Modelo.Usuario;
 
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 
 public class Listado_Formularios extends JPanel implements MouseListener{
 
@@ -38,8 +44,7 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 	
 	private JPanel panel;
 	public static String Listado_Formularios;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JTextField textFiltro;
 	private JTable table;
 	private JTextField textIdEliminar;
 
@@ -64,27 +69,16 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 		lblListaDeFormularios.setBounds(10, 10, 275, 31);
 		panel.add(lblListaDeFormularios);
 		
-		JLabel lblNewLabel_1 = new JLabel("Nombre");
+		JLabel lblNewLabel_1 = new JLabel("Filtrar por:");
 		lblNewLabel_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblNewLabel_1.setBounds(53, 68, 81, 21);
+		lblNewLabel_1.setBounds(10, 68, 81, 21);
 		panel.add(lblNewLabel_1);
 		
-		textField = new JTextField();
-		textField.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		textField.setColumns(10);
-		textField.setBounds(144, 67, 204, 22);
-		panel.add(textField);
-		
-		JLabel lblNewLabel_1_1 = new JLabel("Lugar");
-		lblNewLabel_1_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblNewLabel_1_1.setBounds(53, 111, 81, 21);
-		panel.add(lblNewLabel_1_1);
-		
-		textField_1 = new JTextField();
-		textField_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		textField_1.setColumns(10);
-		textField_1.setBounds(144, 112, 204, 22);
-		panel.add(textField_1);
+		textFiltro = new JTextField();
+		textFiltro.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		textFiltro.setColumns(10);
+		textFiltro.setBounds(30, 110, 376, 22);
+		panel.add(textFiltro);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(30, 152, 920, 419);
@@ -151,6 +145,146 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 		btnBuscar.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnBuscar.setBounds(469, 106, 139, 31);
 		panel.add(btnBuscar);
+		
+		JComboBox<String> comboBoxFiltro = new JComboBox<String>();
+		comboBoxFiltro.setBounds(101, 70, 305, 21);
+		panel.add(comboBoxFiltro);
+		comboBoxFiltro.addItem("");
+		comboBoxFiltro.addItem("Nombre variable");
+		comboBoxFiltro.addItem("Fecha");
+		comboBoxFiltro.addItem("Ubicacion");
+		
+		btnLimpiarFiltros.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {	
+				textFiltro.setText("");
+				comboBoxFiltro.setSelectedItem("");
+				lista();
+			}
+		});
+		
+		btnBuscar.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent e) {
+				if(textFiltro.isVisible() == true || comboBoxFiltro.isVisible() == true) {
+					
+					DefaultTableModel model = new DefaultTableModel() {
+						/**
+						 * 
+						 */
+						private static final long serialVersionUID = 1L;
+
+						public boolean isCellEditable(int row, int column) {
+							return false;
+						}
+					};
+					Object[] columns = {"ID","Fecha","Ubicación","Nombre variable", "Método medición", "Usuario"};
+					
+					model.setColumnIdentifiers(columns);
+					
+					Object [] fila = new Object[columns.length];
+					table.setModel(model);
+					
+					List<Formulario> formularios = new LinkedList<>();
+					
+					if(comboBoxFiltro.getSelectedItem().equals("Nombre variable")) {
+						if(!textFiltro.getText().isEmpty()) {
+							String nombreVariable = textFiltro.getText();
+							
+							formularios = DAO_Formulario.findFormularioNombreVariable(nombreVariable);
+							
+							for(Formulario f: formularios) {
+								fila[0] = f.getId();
+								fila[1] = f.getFecha();
+								fila[2] = f.getUbicacion();
+								fila[3] = f.getNombreVariable();
+								fila[4] = f.getMetodoMedicion();
+								if(f.getAdministrador() != null) {
+									fila[5] = f.getAdministrador().getNombreUsuario();
+								}
+								if(f.getInvestigador() != null) {
+									fila[5] = f.getInvestigador().getNombreUsuario();
+								}
+								if(f.getAficionado() != null) {
+									fila[5] = f.getAficionado().getNombreUsuario();
+								}
+								else {
+									JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
+								}
+							}
+						}
+						else {
+							JOptionPane.showMessageDialog(null, "Por favor, escriba un Nombre");
+						}
+					}
+					else if(comboBoxFiltro.getSelectedItem().equals("Fecha")) {
+						if(!textFiltro.getText().isEmpty()) {
+							String fecha = textFiltro.getText();
+							
+							formularios = DAO_Formulario.findFormularioFecha(fecha);
+							if(formularios.size() != 0) {
+								
+								for(Formulario f: formularios) {
+									fila[0] = f.getId();
+									fila[1] = f.getFecha();
+									fila[2] = f.getUbicacion();
+									fila[3] = f.getNombreVariable();
+									fila[4] = f.getMetodoMedicion();
+									if(f.getAdministrador() != null) {
+										fila[5] = f.getAdministrador().getNombreUsuario();
+									}
+									if(f.getInvestigador() != null) {
+										fila[5] = f.getInvestigador().getNombreUsuario();
+									}
+									if(f.getAficionado() != null) {
+										fila[5] = f.getAficionado().getNombreUsuario();
+									}
+									else {
+										JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
+									}
+								}
+							}
+							else {
+								JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
+							}
+						}
+						else {
+							JOptionPane.showMessageDialog(null, "Por favor, escriba un Apellido");
+						}
+					}
+					else if(comboBoxFiltro.getSelectedItem().equals("Ubicacion")) {
+						if(!textFiltro.getText().isEmpty()) {
+							String ubicacion = textFiltro.getText();
+							
+							formularios = DAO_Formulario.findFormularioUbicacion(ubicacion);
+							if(formularios.size() != 0) {
+								for(Formulario f: formularios) {
+									fila[0] = f.getId();
+									fila[1] = f.getFecha();
+									fila[2] = f.getUbicacion();
+									fila[3] = f.getNombreVariable();
+									fila[4] = f.getMetodoMedicion();
+									if(f.getAdministrador() != null) {
+										fila[5] = f.getAdministrador().getNombreUsuario();
+									}
+									if(f.getInvestigador() != null) {
+										fila[5] = f.getInvestigador().getNombreUsuario();
+									}
+									if(f.getAficionado() != null) {
+										fila[5] = f.getAficionado().getNombreUsuario();
+									}
+							}
+							}
+							else {
+								JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
+							}
+						}
+						else {
+							JOptionPane.showMessageDialog(null, "Por favor, escriba un Nombre de Usuario");
+						}
+					}
+				}
+			}
+		});
 		
 		lista();
 	}
