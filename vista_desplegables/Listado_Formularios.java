@@ -3,15 +3,28 @@ package Vista.vista_desplegables;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
+
+import Controlador.DAO_Formulario;
+import Modelo.Formulario;
+
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
@@ -83,10 +96,15 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane.setViewportView(table);
 		
-		JButton btnNewButton = new JButton("Actualizar listado");
-		btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnNewButton.setBounds(30, 594, 152, 21);
-		panel.add(btnNewButton);
+		JButton btnActualizar = new JButton("Actualizar listado");
+		btnActualizar.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnActualizar.setBounds(30, 594, 152, 21);
+		panel.add(btnActualizar);
+		btnActualizar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				lista();
+			}
+		});
 		
 		JLabel lblNewLabel = new JLabel("Ingrese un ID");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -103,6 +121,26 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 		btnEliminar.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnEliminar.setBounds(843, 594, 107, 21);
 		panel.add(btnEliminar);
+		btnEliminar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String idST = textIdEliminar.getText();
+				int id = Integer.parseInt(idST);
+				
+				DAO_Formulario.delete(id);
+				
+				if(DAO_Formulario.delete(id)) {
+					int respuesta = JOptionPane.showConfirmDialog(null, "¿Seguro que desea eliminar el formulario seleccionado?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+					if(respuesta == JOptionPane.YES_OPTION) {
+						JOptionPane.showMessageDialog(null, "Formulario eliminado correctamente");
+						limpiar();
+						lista();
+					}
+					
+				}else {
+					JOptionPane.showMessageDialog(null, "No es posible eliminar este formulario");
+				}
+			}
+		});
 		
 		JButton btnLimpiarFiltros = new JButton("Limpiar filtros");
 		btnLimpiarFiltros.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -121,10 +159,32 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 			
 			DefaultTableModel modelo= new DefaultTableModel();
 			
-			Object[] columns = {"ID","Nombre","Fecha","Hora","Ubicación","Usuario"};
+			Object[] columns = {"ID","Fecha","Ubicación","Nombre variable", "Método medición", "Usuario"};
 			
 			modelo.setColumnIdentifiers(columns);
 			table.setModel(modelo);
+			
+			List<Formulario> formularios = new LinkedList<>();
+			Object[] fila = new Object[columns.length];
+			formularios = DAO_Formulario.findAll();
+			
+			for(Formulario f: formularios) {
+				fila[0] = f.getId();
+				fila[1] = f.getFecha();
+				fila[2] = f.getUbicacion();
+				fila[3] = f.getNombreVariable();
+				fila[4] = f.getMetodoMedicion();
+				if(f.getAdministrador() != null) {
+					fila[5] = f.getAdministrador().getNombreUsuario();
+				}
+				if(f.getInvestigador() != null) {
+					fila[5] = f.getInvestigador().getNombreUsuario();
+				}
+				if(f.getAficionado() != null) {
+					fila[5] = f.getAficionado().getNombreUsuario();
+				}
+				modelo.addRow(fila);
+			}
 		}
 
 
@@ -155,6 +215,8 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 			textIdEliminar.setText(table.getValueAt(filaSeleccionada, 0).toString());
 		}
 	}
+	
+	
 	
 	public void limpiar() {
 		textIdEliminar.setText("");
