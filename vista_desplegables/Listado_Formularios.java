@@ -5,17 +5,10 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -25,11 +18,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import Controlador.DAO_Formulario;
-import Controlador.DAO_Usuario;
 import Modelo.Formulario;
-import Modelo.Tipo;
-import Modelo.Usuario;
-
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
@@ -54,7 +43,6 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 	 */
 	public Listado_Formularios() {
 		Listado_Formularios = "Listado_Formularios";
-
 		
 		setBounds(new Rectangle(0, 0, 985, 658));
 		setLayout(new CardLayout(0, 0));
@@ -89,6 +77,8 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 		table.addMouseListener(this);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane.setViewportView(table);
+		
+		lista();
 		
 		JButton btnActualizar = new JButton("Actualizar listado");
 		btnActualizar.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -191,26 +181,30 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 							String nombreVariable = textFiltro.getText();
 							
 							formularios = DAO_Formulario.findFormularioNombreVariable(nombreVariable);
+							if(formularios.size() != 0) {
 							
-							for(Formulario f: formularios) {
-								fila[0] = f.getId();
-								fila[1] = f.getFecha();
-								fila[2] = f.getUbicacion();
-								fila[3] = f.getNombreVariable();
-								fila[4] = f.getMetodoMedicion();
-								if(f.getAdministrador() != null) {
-									fila[5] = f.getAdministrador().getNombreUsuario();
+								for(Formulario f: formularios) {
+									fila[0] = f.getId();
+									fila[1] = f.getFecha();
+									fila[2] = f.getUbicacion();
+									fila[3] = f.getNombreVariable();
+									fila[4] = f.getMetodoMedicion();
+									if(f.getAdministrador() != null) {
+										fila[5] = f.getAdministrador().getNombreUsuario();
+									}
+									if(f.getInvestigador() != null) {
+										fila[5] = f.getInvestigador().getNombreUsuario();
+									}
+									if(f.getAficionado() != null) {
+										fila[5] = f.getAficionado().getNombreUsuario();
+									}
+									model.addRow(fila);
+								
 								}
-								if(f.getInvestigador() != null) {
-									fila[5] = f.getInvestigador().getNombreUsuario();
-								}
-								if(f.getAficionado() != null) {
-									fila[5] = f.getAficionado().getNombreUsuario();
-								}
+							}
 								else {
 									JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
 								}
-							}
 						}
 						else {
 							JOptionPane.showMessageDialog(null, "Por favor, escriba un Nombre");
@@ -238,9 +232,7 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 									if(f.getAficionado() != null) {
 										fila[5] = f.getAficionado().getNombreUsuario();
 									}
-									else {
-										JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
-									}
+									model.addRow(fila);
 								}
 							}
 							else {
@@ -272,7 +264,8 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 									if(f.getAficionado() != null) {
 										fila[5] = f.getAficionado().getNombreUsuario();
 									}
-							}
+									model.addRow(fila);
+								}
 							}
 							else {
 								JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
@@ -282,11 +275,11 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 							JOptionPane.showMessageDialog(null, "Por favor, escriba un Nombre de Usuario");
 						}
 					}
+		
+		lista();
 				}
 			}
 		});
-		
-		lista();
 	}
 		
 		public void lista() {
