@@ -110,8 +110,6 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 				String idST = textIdEliminar.getText();
 				int id = Integer.parseInt(idST);
 				
-				DAO_Formulario.delete(id);
-				
 				if(DAO_Formulario.delete(id)) {
 					int respuesta = JOptionPane.showConfirmDialog(null, "¿Seguro que desea eliminar el formulario seleccionado?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 					if(respuesta == JOptionPane.YES_OPTION) {
@@ -199,7 +197,6 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 										fila[5] = f.getAficionado().getNombreUsuario();
 									}
 									model.addRow(fila);
-								
 								}
 							}
 								else {
@@ -296,7 +293,7 @@ public class Listado_Formularios extends JPanel implements MouseListener{
 			formularios = DAO_Formulario.findAll();
 			
 			for(Formulario f: formularios) {
-				fila[0] = f.getId();
+				fila[0] = String.valueOf(f.getId());
 				fila[1] = f.getFecha();
 				fila[2] = f.getUbicacion();
 				fila[3] = f.getNombreVariable();

@@ -834,6 +834,7 @@ public class Listado_Usuarios extends JPanel {
 				}
 				comboBox.setSelectedItem("");
 				model.setNumRows(0);
+				listarTodo();
 			}
 			
 		});
