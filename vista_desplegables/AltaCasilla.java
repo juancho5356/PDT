@@ -187,13 +187,13 @@ public class AltaCasilla extends JPanel {
 						}
 						
 					}catch(Exception ex) {
-						JOptionPane.showMessageDialog(null, "No es posible aÃ±adir la casilla");
+						JOptionPane.showMessageDialog(null, "No es posible añadir la casilla");
 						ex.printStackTrace();
 					}
 					
 				}
 				else {
-					JOptionPane.showMessageDialog(null, "No es posible aÃ±adir la casilla, campos obligatorios sin rellenar");
+					JOptionPane.showMessageDialog(null, "No es posible añadir la casilla, campos obligatorios sin rellenar");
 				}
 			}
 		});

@@ -1,4 +1,4 @@
-package Vista.vista_desplegables;
+package vista_desplegables;
 
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -7,6 +7,7 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -16,12 +17,16 @@ import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.table.DefaultTableModel;
 
-import Controlador.*;
-import Modelo.*;
+import com.servicios.Departamento_BeanRemote;
+import com.servicios.EstacionDeMedicion_BeanRemote;
+
+import model.*;
 import javax.swing.JComboBox;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -349,7 +354,41 @@ public class Listado_Estaciones extends JPanel {
 		lblSeleccioneUnRegistro.setForeground(Color.DARK_GRAY);
 		lblSeleccioneUnRegistro.setVisible(false);
 		
-		LinkedList<Departamento> departamentos = DAO_Departamento.allDepartamentos();
+		DefaultTableModel model = new DefaultTableModel();
+		
+		Object[] columns = {"Nombre", "Latitud", "Longitud", "Calidad de Aire", "Humedad Relativa", "Departamento", "Investigador"};
+		
+		model.setColumnIdentifiers(columns);
+		
+		Object [] fila = new Object[columns.length];
+		table.setModel(model);
+		
+		List<EstacionesDeMedicion> estaciones = new LinkedList<>();
+		
+		try {
+			String dato3 = "PDT_EJB/EstacionDeMedicion_Bean!com.servicios.EstacionDeMedicion_BeanRemote";
+			EstacionDeMedicion_BeanRemote de = (EstacionDeMedicion_BeanRemote) InitialContext.doLookup(dato3);
+			estaciones = de.allEstaciones();
+			
+			listar(estaciones, fila, model);
+			
+		} catch(NamingException ex) {
+			ex.getMessage();
+		}
+		
+		
+		
+		List<Departamento> departamentos = new LinkedList<>();
+		
+		try {
+			String dato3 = "PDT_EJB/Departamento_Bean!com.servicios.Departamento_BeanRemote";
+			Departamento_BeanRemote de = (Departamento_BeanRemote) InitialContext.doLookup(dato3);
+			departamentos = de.allDepartamentos();
+			
+		} catch(NamingException ex) {
+			ex.getMessage();
+		}
+		
 		
 		for(Departamento d: departamentos) {
 			comboBox_Departamento.addItem(d.getNombre());
@@ -380,13 +419,21 @@ public class Listado_Estaciones extends JPanel {
 					Object [] fila = new Object[columns.length];
 					table.setModel(model);
 					
-					LinkedList<Estacion_Medicion> estaciones = new LinkedList<>();
+					List<EstacionesDeMedicion> estaciones = new LinkedList<>();
 					
 					if(rdbtnDepartamento.isSelected()) {
 						if(!(comboBox_Departamento.getSelectedItem().equals(""))) {
 							String departamento = (String) comboBox_Departamento.getSelectedItem();
 						
-							estaciones = DAO_Estacion_Medicion.xDepartamento(departamento);
+							try {
+								String dato3 = "PDT_EJB/EstacionDeMedicion_Bean!com.servicios.EstacionDeMedicion_BeanRemote";
+								EstacionDeMedicion_BeanRemote de = (EstacionDeMedicion_BeanRemote) InitialContext.doLookup(dato3);
+								estaciones = de.xDepartamento(departamento);
+								
+							} catch(NamingException ex) {
+								ex.getMessage();
+							}
+							
 							if(estaciones.size() != 0) {
 								lblSeleccioneUnRegistro.setVisible(true);
 								listar(estaciones, fila,  model);
@@ -406,7 +453,14 @@ public class Listado_Estaciones extends JPanel {
 						if(!(textField.getText().isEmpty())) {
 							String nombre = textField.getText();
 						
-							estaciones = DAO_Estacion_Medicion.xNombre(nombre);
+							try {
+								String dato3 = "PDT_EJB/EstacionDeMedicion_Bean!com.servicios.EstacionDeMedicion_BeanRemote";
+								EstacionDeMedicion_BeanRemote de = (EstacionDeMedicion_BeanRemote) InitialContext.doLookup(dato3);
+								estaciones = de.xNombre(nombre);
+								
+							} catch(NamingException ex) {
+								ex.getMessage();
+							}
 							if(estaciones.size() != 0) {
 								lblSeleccioneUnRegistro.setVisible(true);
 								listar(estaciones, fila,  model);
@@ -418,7 +472,7 @@ public class Listado_Estaciones extends JPanel {
 							}
 						}
 						else {
-							JOptionPane.showMessageDialog(null, "Por favor ingrese un Nombre de EstaciÃ³n para poder buscar");
+							JOptionPane.showMessageDialog(null, "Por favor ingrese un Nombre de Estación para poder buscar");
 						}
 					}
 				}
@@ -438,20 +492,20 @@ public class Listado_Estaciones extends JPanel {
 		textDepartamento.setText("");
 		textInvestigador.setText("");
 	}
-	public void listar(LinkedList<Estacion_Medicion> estaciones, Object [] fila, DefaultTableModel model) {
-		for (Estacion_Medicion e: estaciones){
+	public void listar(List<EstacionesDeMedicion> estaciones, Object [] fila, DefaultTableModel model) {
+		for (EstacionesDeMedicion e: estaciones){
 			
 			String n = e.getNombre();
 			String la = e.getLatitud();
 			String lo = e.getLongitud();
-			String ca = e.getCalidad_aire();
-			String hu = e.getHumedad_relativa();
+			String ca = e.getCalidadAire();
+			String hu = e.getHumedadRelativa();
 			
 			Departamento departamento = e.getDepartamento();
 			String d = departamento.getNombre();
 			
-			Investigador investigador = e.getInvestigador();
-			String i = investigador.getNombre() + " " + investigador.getApellido();
+			Investigador investigador = e.getInvestigadore();
+			String i = investigador.getUsuario().getNombre() + " " + investigador.getUsuario().getApellido();
 			
 			fila[0] = n;
 			fila[1] = la;

@@ -1,4 +1,4 @@
-package Vista.vista_desplegables;
+package vista_desplegables;
 
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -14,6 +14,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,12 +25,20 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import Controlador.*;
-import Modelo.*;
+import com.exception.*;
+import com.servicios.Administrador_BeanRemote;
+import com.servicios.Aficionado_BeanRemote;
+import com.servicios.Ciudad_BeanRemote;
+import com.servicios.Investigador_BeanRemote;
+import com.servicios.Usuario_BeanRemote;
+
+import model.*;
 
 import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.swing.JButton;
 import javax.swing.JSeparator;
 import java.awt.SystemColor;
@@ -74,20 +83,7 @@ public class Listado_Usuarios extends JPanel {
 	private JButton btnActualizarUsuario;
 	private JButton btnEliminarUsuario;
 	private JLabel lblSeleccione;
-
-	public boolean nombre;
-	public boolean apellido;
-	public boolean nombreUsuario;
-	public boolean correo;
 	
-	public boolean ocupacion;
-	
-	public boolean cedula;
-	public boolean domicilio;
-	public boolean telefono;
-	
-	public boolean ciudad;
-	public boolean rol;
 	private JLabel lblCampoCorreo;
 	private JLabel lblCampoCedula;
 	private JLabel lblCampoTelefono;
@@ -105,6 +101,11 @@ public class Listado_Usuarios extends JPanel {
 	/**
 	 * Create the panel.
 	 */
+	String estado;
+	private JTextField textId;
+	
+	private JSeparator separator_1;
+
 	public Listado_Usuarios() {
 		Listado_Usuario = "Listado_Usuario";
 
@@ -116,6 +117,10 @@ public class Listado_Usuarios extends JPanel {
 		panel.setBackground(new Color(255, 255, 255));
 		add(panel, "name_25541786307800");
 		panel.setLayout(null);
+		
+		separator = new JSeparator();
+		separator.setBounds(10, 39, 214, 2);
+		panel.add(separator);
 		
 		JLabel lblListaDeUsuarios = new JLabel("Listado de Usuarios");
 		lblListaDeUsuarios.setFont(new Font("Baskerville Old Face", Font.ITALIC, 27));
@@ -130,159 +135,6 @@ public class Listado_Usuarios extends JPanel {
 		table.setSurrendersFocusOnKeystroke(true);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		scrollPane.setViewportView(table);
-		listarTodo();
-		
-		table.addMouseListener(new MouseListener() {
-
-			public void mouseClicked(MouseEvent e) {
-				limpiar();
-				
-				int filaSeleccionada;
-				
-				filaSeleccionada = table.getSelectedRow();
-				if(filaSeleccionada == -1) {
-					elsee();
-				}else {
-					textNombre.setText(table.getValueAt(filaSeleccionada, 0).toString());
-					textApellido.setText(table.getValueAt(filaSeleccionada, 1).toString());
-					textCorreo.setText(table.getValueAt(filaSeleccionada, 2).toString());
-					
-					String tipo_usuario = table.getValueAt(filaSeleccionada, 4).toString();
-					String correo = table.getValueAt(filaSeleccionada, 2).toString();
-					
-					Usuario user = DAO_Usuario.findUsuarioMail(correo);
-					
-					Investigador inv = DAO_Investigador.findInvestigador(user.getNombreUsuario(), user.getContrasenia());
-					Administrador adm = DAO_Administrador.findAdministrador(user.getNombreUsuario(), user.getContrasenia());
-					Aficionado afi = DAO_Aficionado.findAficionado(user.getNombreUsuario(), user.getContrasenia());
-
-					if(inv != null) {
-						inve_admin();
-						
-						
-						textCedula.setText(String.valueOf(inv.getDocumento()));
-						comboBox_Ciudad.setSelectedItem(inv.getCiudad().getNombre());
-						comboBox_Rol2.setSelectedItem("INVESTIGADOR");
-						textDomicilio.setText(inv.getDomicilio());
-						textTelefono.setText(String.valueOf(inv.getTelefono()));
-						
-						comboBox_Rol.addItemListener(new ItemListener() {
-
-							public void itemStateChanged(ItemEvent e) {
-								// TODO Auto-generated method stub
-							}
-							
-						});
-
-					}else if(adm != null) {
-						inve_admin();
-
-						textCedula.setText(String.valueOf(adm.getDocumento()));
-						comboBox_Ciudad.setSelectedItem(adm.getCiudad().getNombre());
-						comboBox_Rol2.setSelectedItem("ADMINISTRADOR");
-						textDomicilio.setText(adm.getDomicilio());
-						textTelefono.setText(String.valueOf(adm.getTelefono()));
-						
-					}else if(afi != null) {
-						aficionado();
-												
-						textOcupacion.setText(afi.getOcupacion());
-						comboBox_Rol2.setSelectedItem("AFICIONADO");
-
-					}
-					
-					btnEliminarUsuario.addMouseListener(new MouseListener() {
-
-						@Override
-						public void mouseClicked(MouseEvent e) {
-							int respuesta = JOptionPane.showConfirmDialog(null, "¿Realmente quieres eliminar a este usuario? Una vez hecho, no hay vuelta atrás", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-							if(respuesta == JOptionPane.YES_OPTION) {
-								if(tipo_usuario.equals("ADMINISTRADOR")) {
-									if(DAO_Administrador.delete(adm)) {
-										if(DAO_Usuario.delete(user)) {
-											JOptionPane.showMessageDialog(null, "Usuario Administrador eliminado del sistema");
-											limpiar();
-											listarTodo();
-										}
-									}else {
-										JOptionPane.showMessageDialog(null, "No es posible eliminar este usuario");
-									}
-								}
-								else if(tipo_usuario.equals("INVESTIGADOR")) {
-									if(DAO_Investigador.delete(inv)) {
-										if(DAO_Usuario.delete(user)) {
-											JOptionPane.showMessageDialog(null, "Usuario Investigador eliminado del sistema");
-											limpiar();
-											listarTodo();
-
-										}
-										
-									}else {
-										JOptionPane.showMessageDialog(null, "No es posible eliminar este usuario");
-									}
-								}
-								else if(tipo_usuario.equals("AFICIONADO")) {
-									if(DAO_Aficionado.delete(afi)) {
-										if(DAO_Usuario.delete(user)) {
-											JOptionPane.showMessageDialog(null, "Usuario Aficionado eliminado del sistema");
-											limpiar();
-											listarTodo();
-
-										}
-									}else {
-										JOptionPane.showMessageDialog(null, "No es posible eliminar este usuario");
-									}
-								}
-							}
-						}
-
-						@Override
-						public void mousePressed(MouseEvent e) {
-							// TODO Auto-generated method stub
-							
-						}
-
-						@Override
-						public void mouseReleased(MouseEvent e) {
-							// TODO Auto-generated method stub
-							
-						}
-
-						@Override
-						public void mouseEntered(MouseEvent e) {
-							// TODO Auto-generated method stub
-							
-						}
-
-						@Override
-						public void mouseExited(MouseEvent e) {
-							// TODO Auto-generated method stub
-							
-						}
-						
-						
-					});
-				}
-
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {	
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {				
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {				
-			}
-			
-		});
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBackground(new Color(240, 248, 255));
@@ -290,13 +142,44 @@ public class Listado_Usuarios extends JPanel {
 		panel.add(panel_1);
 		panel_1.setLayout(null);
 		
-		lblInformacionUsuario = new JLabel("Información de Usuario");
+		separator_1 = new JSeparator();
+		separator_1.setBounds(10, 89, 318, 2);
+		panel_1.add(separator_1);
+		
+		lblInformacionUsuario = new JLabel("Informaci\u00F3n de Usuario");
 		lblInformacionUsuario.setHorizontalAlignment(SwingConstants.CENTER);
-		lblInformacionUsuario.setFont(new Font("Baskerville Old Face", Font.ITALIC, 27));
+		lblInformacionUsuario.setFont(new Font("Baskerville Old Face", Font.BOLD | Font.ITALIC, 20));
 		lblInformacionUsuario.setBounds(0, 60, 338, 31);
 		panel_1.add(lblInformacionUsuario);
 		
+		DefaultTableModel modelo = new DefaultTableModel();
+		
+		Object[] columns = {"Nombre", "Apellido", "E-mail", "Nombre de Usuario", "Rol de Usuario"};
+		
+		modelo.setColumnIdentifiers(columns);
+		
+		Object [] fila = new Object[columns.length];
+		table.setModel(modelo);
+		
+		List<Usuario> usuarios = new LinkedList<>();
+		
+		Tipo_Rol tipo = null;
+		
+		try {
+			String dato = "PDT_EJB/Usuario_Bean!com.servicios.Usuario_BeanRemote";
+			Usuario_BeanRemote us = (Usuario_BeanRemote) InitialContext.doLookup(dato);
+			
+			usuarios = us.allUsuarios();
+			listarUsuario(usuarios, fila, modelo, tipo);
+			
+		}catch (NamingException e) {
+			e.printStackTrace();
+		}
+		
+		//new Color(240, 255, 240)
+		
 		textNombre = new JTextField();
+		textNombre.setBackground(Color.WHITE);
 		textNombre.setColumns(10);
 		textNombre.setBounds(124, 118, 204, 25);
 		panel_1.add(textNombre);
@@ -309,31 +192,29 @@ public class Listado_Usuarios extends JPanel {
 					e.consume();
 					
 					JOptionPane.showMessageDialog(null, "Campo 'Nombre' debe contener solo letras");
-					nombre = false;
+					
 				}
 				else {
-					nombre = true;
+					textNombre.setBackground(new Color(240, 255, 240));
 				}
 				if(textNombre.getText().equals("")) {
-					nombre= false;
+					textNombre.setBackground(new Color(255, 228, 225));
 				}
-				habilitarBoton();
-
 			}
 
 			public void keyPressed(KeyEvent e) {
-				habilitarBoton();
 
 			}
 
 			public void keyReleased(KeyEvent e) {
-				habilitarBoton();
 	
 			}
 			
 		});
+		// new Color(255, 228, 225)
 		
 		textApellido = new JTextField();
+		textApellido.setBackground(Color.WHITE);
 		textApellido.setColumns(10);
 		textApellido.setBounds(124, 171, 204, 25);
 		panel_1.add(textApellido);
@@ -347,27 +228,23 @@ public class Listado_Usuarios extends JPanel {
 					e.consume();
 					
 					JOptionPane.showMessageDialog(null, "Campo 'Apellido' debe contener solo letras");
-					apellido = false;
 				}
 				else {
-					apellido = true;
+					textApellido.setBackground(new Color(240, 255, 240));
 				}
-				habilitarBoton();
 				
 				if(textApellido.getText().equals("")) {
-					apellido = false;
+					textApellido.setBackground(new Color(255, 228, 225));
 				}
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				habilitarBoton();
 				
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				habilitarBoton();
 				
 			}
 			
@@ -383,16 +260,14 @@ public class Listado_Usuarios extends JPanel {
 			public void focusLost(FocusEvent e) {
 				if(isEmail(textCorreo.getText())) {
 					lblCampoCorreo.setForeground(Color.GRAY);
-					correo = true;
+					
+					textCorreo.setBackground(new Color(240, 255, 240));
 				}
 				else {
 					lblCampoCorreo.setForeground(Color.RED);
-					correo = false;
+					
+					textCorreo.setBackground(new Color(255, 228, 225));
 				}
-				
-				
-				habilitarBoton();
-
 			}
 			
 		});
@@ -402,34 +277,41 @@ public class Listado_Usuarios extends JPanel {
 			public void keyTyped(KeyEvent e) {
 				if(isEmail(textCorreo.getText())) {
 					lblCampoCorreo.setForeground(Color.GRAY);
-					correo = true;
+					
+					textCorreo.setBackground(new Color(240, 255, 240));
 				}
 				else {
 					lblCampoCorreo.setForeground(Color.RED);
-					correo = false;
+					
+					textCorreo.setBackground(new Color(255, 228, 225));
 				}
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				
-				habilitarBoton();
-
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if(isEmail(textCorreo.getText())) {
 					lblCampoCorreo.setForeground(Color.GRAY);
-					correo = true;
+					textCorreo.setBackground(new Color(240, 255, 240));
 				}
 				else {
 					lblCampoCorreo.setForeground(Color.RED);
-					correo = false;
+					textCorreo.setBackground(new Color(255, 228, 225));
 				}
 				
-				habilitarBoton();
-				
+				if(!(textCorreo.getText().equals(""))) {
+					if(existeUsuario(textCorreo.getText(), Long.parseLong(textId.getText()))) {
+						JOptionPane.showMessageDialog(null, "El correo ingresado ya existe en el sistema!");
+						
+						textCorreo.setBackground(new Color(255, 228, 225));
+					}
+				}
+				else {
+					textCorreo.setBackground(new Color(240, 255, 240));
+				}
 			}
 			
 		});
@@ -456,9 +338,9 @@ public class Listado_Usuarios extends JPanel {
 		panel_1.add(comboBox_Rol2);
 		
 		LinkedList<String> allRoles = new LinkedList<>();
-		allRoles.add(Modelo.Tipo.AFICIONADO.name());
-		allRoles.add(Modelo.Tipo.ADMINISTRADOR.name());
-		allRoles.add(Modelo.Tipo.INVESTIGADOR.name());
+		allRoles.add(model.Tipo_Rol.AFICIONADO.name());
+		allRoles.add(model.Tipo_Rol.ADMINISTRADOR.name());
+		allRoles.add(model.Tipo_Rol.INVESTIGADOR.name());
 
 		for (String s: allRoles){
 			comboBox_Rol2.addItem(s);
@@ -483,30 +365,42 @@ public class Listado_Usuarios extends JPanel {
 					evt.consume();
 					
 					JOptionPane.showMessageDialog(null, "Teléfono debe contener solo números");
-					lblCampoTelefono.setForeground(Color.RED);
-
-					telefono = false;
+					
 				}
 				else {
 					lblCampoTelefono.setForeground(Color.GRAY);
 					
-					telefono = true;
+					textTelefono.setBackground(new Color(240, 255, 240));
 
 				}
 				if(textTelefono.getText().equals("")) {
-					telefono = false;
+					textTelefono.setBackground(new Color(255, 228, 225));
 				}
-				habilitarBoton();
 
 			}
 
 			public void keyPressed(KeyEvent e) {
-				habilitarBoton();
 
 			}
 			public void keyReleased(KeyEvent e) {
-				habilitarBoton();
+				char validar = e.getKeyChar();
+				
+				if(isNumero(validar, e) == false) {
+					e.consume();
+					
+					JOptionPane.showMessageDialog(null, "Teléfono debe contener solo números");
+					lblCampoTelefono.setForeground(Color.RED);
 
+				}
+				else {
+					lblCampoTelefono.setForeground(Color.GRAY);
+					
+					textTelefono.setBackground(new Color(240, 255, 240));
+
+				}
+				if(textTelefono.getText().equals("")) {
+					textTelefono.setBackground(new Color(255, 228, 225));
+				}
 			}
 		});
 		
@@ -523,29 +417,25 @@ public class Listado_Usuarios extends JPanel {
 				
 				if(((Character.isAlphabetic(validar)) || (Character.isDigit(validar))) || validar == KeyEvent.VK_BACK_SPACE || validar == KeyEvent.VK_SPACE) {
 					
-					domicilio = true;
+					textDomicilio.setBackground(new Color(240, 255, 240));
 				}
 				else {
 					e.consume();
 					JOptionPane.showMessageDialog(null, "El domicilio puede contener: letras y números");
 					
-					domicilio = false;
 				}
 				if(textDomicilio.getText().equals("")) {
-					domicilio = false;
+					textDomicilio.setBackground(new Color(255, 228, 225));
 				}
-				habilitarBoton();
 
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				habilitarBoton();
 
 			}
 
 			public void keyReleased(KeyEvent e) {
-				habilitarBoton();
 
 			}
 			
@@ -557,30 +447,19 @@ public class Listado_Usuarios extends JPanel {
 		panel_1.add(lblDomicilio);
 		lblDomicilio.setVisible(false);
 		
-		lblCedula = new JLabel("Cédula");
+		lblCedula = new JLabel("C\u00E9dula");
 		lblCedula.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
 		lblCedula.setBounds(10, 347, 170, 25);
 		panel_1.add(lblCedula);
 		lblCedula.setVisible(false);
 		
-		lblTelefono = new JLabel("Teléfono");
+		lblTelefono = new JLabel("Tel\u00E9fono");
 		lblTelefono.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
 		lblTelefono.setBounds(10, 510, 170, 25);
 		panel_1.add(lblTelefono);
 		lblTelefono.setVisible(false);
 		
-		comboBox_Ciudad = new JComboBox<Object>();
-		comboBox_Ciudad.setFont(new Font("Baskerville Old Face", Font.PLAIN, 14));
-		comboBox_Ciudad.setBackground(SystemColor.menu);
-		comboBox_Ciudad.setBounds(124, 400, 204, 25);
-		panel_1.add(comboBox_Ciudad);
-		comboBox_Ciudad.addItem("");
 		
-		LinkedList<Ciudad> allCiudades = DAO_Ciudad.allCiudades();
-		for(Ciudad c : allCiudades) {
-			comboBox_Ciudad.addItem(c.getNombre());
-		}
-		comboBox_Ciudad.setVisible(false);
 		
 		lblCiudad = new JLabel("Ciudad");
 		lblCiudad.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
@@ -603,34 +482,30 @@ public class Listado_Usuarios extends JPanel {
 					
 					JOptionPane.showMessageDialog(null, "La ocupación debe contener solo letras");
 					
-					ocupacion = false;
 
 				}
 				else {
-					ocupacion = true;
+					textOcupacion.setBackground(new Color(240, 255, 240));
 				}
 				if(textOcupacion.getText().equals("")) {
-					ocupacion = false;
+					textOcupacion.setBackground(new Color(255, 228, 225));
 				}
-				habilitarBoton();
 
 			}
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				habilitarBoton();
 				
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				habilitarBoton();
 				
 			}
 			
 		});;
 		
-		lblOcupacion = new JLabel("Ocupación");
+		lblOcupacion = new JLabel("Ocupaci\u00F3n");
 		lblOcupacion.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
 		lblOcupacion.setBounds(10, 347, 170, 25);
 		panel_1.add(lblOcupacion);
@@ -641,41 +516,335 @@ public class Listado_Usuarios extends JPanel {
 		btnActualizarUsuario.setBackground(new Color(173, 216, 230));
 		btnActualizarUsuario.setBounds(10, 563, 318, 31);
 		panel_1.add(btnActualizarUsuario);
-		btnActualizarUsuario.setEnabled(true);
+		btnActualizarUsuario.setEnabled(false);;
 		btnActualizarUsuario.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				int filaSeleccionada;
-				
-				filaSeleccionada = table.getSelectedRow();
-				if(filaSeleccionada == -1) {
-					elsee();
+				if(textNombre.getText().contentEquals("") || textApellido.getText().equals("") || textCorreo.getText().equals("")
+						|| isEmail(textCorreo.getText()) == false || comboBox_Rol2.getSelectedItem().equals("")) {
+					JOptionPane.showMessageDialog(null, "Se deben completar todos los campos obligatorios");
 				}
-				String tipo_usuario = table.getValueAt(filaSeleccionada, 4).toString();
-				
-				if(tipo_usuario.equals("ADMINISTRADOR")) {
-					actualizarAdministrador();
+				else {
+					Boolean permitido = false;
 					
-				}
-				
-				if(tipo_usuario.equals("INVESTIGADOR")) {
-					actualizarInvestigador();
-				}
-				
-				if(tipo_usuario.equals("AFICIONADO")) {
-					actualizarAficionado();
+					String n = textNombre.getText();
+					String a = textApellido.getText();
+					String m = textCorreo.getText();
+					
+					String r = (String) comboBox_Rol2.getSelectedItem();
+					
+					if(r.equals("ADMINISTRADOR") || r.equals("INVESTIGADOR")) {
+						if(textCedula.getText().equals("") || isCedula() == false || textDomicilio.getText().equals("") || comboBox_Ciudad.getSelectedItem().equals("")
+								|| textTelefono.getText().equals("")) {
+							
+							JOptionPane.showMessageDialog(null, "Se deben completar todos los campos obligatorios");
+							permitido = false;
+						}
+						else {
+							permitido = true;
+						}
+					}
+					else if(r.equals("AFICIONADO")) {
+						if(textOcupacion.getText().equals("")) {
+							
+							JOptionPane.showMessageDialog(null, "Se deben completar todos los campos obligatorios");
+							permitido = false;
+						}
+						else {
+							permitido = true;
+						}
+					}else {
+						permitido = false;
+					}
+					try {
+						
+						if (permitido == true) {
+							int respuesta = JOptionPane.showConfirmDialog(null, "¿ Realmente quieres modificar a este usuario ?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+							
+							if(respuesta == JOptionPane.YES_OPTION) {
+								
+								///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								
+								String dato = "PDT_EJB/Usuario_Bean!com.servicios.Usuario_BeanRemote";
+								Usuario_BeanRemote us = (Usuario_BeanRemote) InitialContext.doLookup(dato);
+							
+								String dato1 = "PDT_EJB/Administrador_Bean!com.servicios.Administrador_BeanRemote";
+								Administrador_BeanRemote ad = (Administrador_BeanRemote) InitialContext.doLookup(dato1);
+								
+								String dato2 = "PDT_EJB/Investigador_Bean!com.servicios.Investigador_BeanRemote";
+								Investigador_BeanRemote i = (Investigador_BeanRemote) InitialContext.doLookup(dato2);
+								
+								String dato3 = "PDT_EJB/Aficionado_Bean!com.servicios.Aficionado_BeanRemote";
+								Aficionado_BeanRemote af = (Aficionado_BeanRemote) InitialContext.doLookup(dato3);
+								
+								///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+								
+								
+								
+								Usuario user = us.findId(Long.parseLong(textId.getText()));
+								
+								Administrador admin = ad.findUsuario(user.getIdUsuario());
+								Investigador inves = i.findUsuario(user.getIdUsuario());
+								Aficionado afic = af.findUsuario(user.getIdUsuario());
+								
+								user.setNombre(n);
+								user.setApellido(a);
+								user.setMail(m);
+								
+								if(admin != null) {
+									String dato5 = "PDT_EJB/Ciudad_Bean!com.servicios.Ciudad_BeanRemote";
+									Ciudad_BeanRemote ciu = (Ciudad_BeanRemote) InitialContext.doLookup(dato5);
+									Ciudad ciudad = ciu.findCiudadNombre((String) comboBox_Ciudad.getSelectedItem());
+									
+									if(r.equals("ADMINISTRADOR")) {
+										
+										admin.setDocumento(Integer.parseInt(textCedula.getText()));
+										admin.setDomicilio(textDomicilio.getText());
+										admin.setCiudade(ciudad);
+										admin.setTelefono(Integer.parseInt(textTelefono.getText()));
+										
+										if(ad.edit(admin) && us.edit(user)) {
+											JOptionPane.showMessageDialog(null, "Usuario modificado correctamente");
+											limpiar();
+											elsee();
+											habilitar(false);
+											filtro(true);
+										}else {
+											JOptionPane.showMessageDialog(null, "No es posible modificar este usuario");
+										}
+										
+									}else if(r.equals("INVESTIGADOR")){
+										
+										Investigador nuevoIn = new Investigador();
+										
+										nuevoIn.setDocumento(Integer.parseInt(textCedula.getText()));
+										nuevoIn.setDomicilio(textDomicilio.getText());
+										nuevoIn.setCiudade(ciudad);
+										nuevoIn.setTelefono(Integer.parseInt(textTelefono.getText()));
+										
+										if(ad.delete(admin)) {
+											nuevoIn.setUsuario(user);
+											
+											if(us.edit(user) && i.insert(nuevoIn)) {
+												JOptionPane.showMessageDialog(null, "Usuario modificado correctamente");
+												limpiar();
+												elsee();
+												habilitar(false);
+												filtro(true);
+											}	
+										}else {
+											JOptionPane.showMessageDialog(null, "No es posible modificar este usuario");
+										}
+									}
+									
+									else if(r.equals("AFICIONADO")){
+										
+										Aficionado nuevoAf = new Aficionado();
+										
+										nuevoAf.setOcupacion(textOcupacion.getText());
+										
+										if(ad.delete(admin)) {
+											nuevoAf.setUsuario(user);
+											
+											if(us.edit(user) && af.insert(nuevoAf)) {
+												JOptionPane.showMessageDialog(null, "Usuario modificado correctamente");
+												limpiar();
+												elsee();
+												habilitar(false);
+												filtro(true);
+											}
+										}else {
+											JOptionPane.showMessageDialog(null, "No es posible modificar este usuario");
+										}
+									}
+								}
+								////////////////////////////////////////////
+								
+								else if(inves != null) {
+									String dato5 = "PDT_EJB/Ciudad_Bean!com.servicios.Ciudad_BeanRemote";
+									Ciudad_BeanRemote ciu = (Ciudad_BeanRemote) InitialContext.doLookup(dato5);
+									Ciudad ciudad = ciu.findCiudadNombre((String) comboBox_Ciudad.getSelectedItem());
+									
+									if(r.equals("INVESTIGADOR")) {
+										
+										inves.setDocumento(Integer.parseInt(textCedula.getText()));
+										inves.setDomicilio(textDomicilio.getText());
+										inves.setCiudade(ciudad);
+										inves.setTelefono(Integer.parseInt(textTelefono.getText()));
+										
+										if(i.edit(inves) && us.edit(user)) {
+											JOptionPane.showMessageDialog(null, "Usuario modificado correctamente");
+											limpiar();
+											elsee();
+											habilitar(false);
+											filtro(true);
+										}else {
+											JOptionPane.showMessageDialog(null, "No es posible modificar este usuario");
+										}
+									}
+									else if(r.equals("AFICIONADO")){
+										
+										Aficionado nuevoAf = new Aficionado();
+										
+										nuevoAf.setOcupacion(textOcupacion.getText());
+										
+										if(i.delete(inves)) {
+											nuevoAf.setUsuario(user);
+											
+											if(us.edit(user) && af.insert(nuevoAf)) {
+												JOptionPane.showMessageDialog(null, "Usuario modificado correctamente");
+												limpiar();
+												elsee();
+												habilitar(false);
+												filtro(true);
+											}else {
+												JOptionPane.showMessageDialog(null, "No es posible modificar este usuario");
+											}
+										}
+									}
+									else if(r.equals("ADMINISTRADOR")){
+										
+										Administrador nuevoAd = new Administrador();
+										
+										nuevoAd.setDocumento(Integer.parseInt(textCedula.getText()));
+										nuevoAd.setDomicilio(textDomicilio.getText());
+										nuevoAd.setCiudade(ciudad);
+										nuevoAd.setTelefono(Integer.parseInt(textTelefono.getText()));
+										
+										if(i.delete(inves)) {
+											nuevoAd.setUsuario(user);
+											
+											if(us.edit(user) && ad.insert(nuevoAd)) {
+												JOptionPane.showMessageDialog(null, "Usuario modificado correctamente");
+												limpiar();
+												elsee();
+												habilitar(false);
+												filtro(true);
+											}	
+										}else {
+											JOptionPane.showMessageDialog(null, "No es posible modificar este usuario");
+										}
+									}
+								}
+								////////////////////////////////////////////
+
+								else if(afic != null) {
+									if(r.equals("AFICIONADO")) {
+										
+										afic.setOcupacion(textOcupacion.getText());
+										
+										if(af.edit(afic) && us.edit(user)) {
+											JOptionPane.showMessageDialog(null, "Usuario modificado correctamente");
+											limpiar();
+											elsee();
+											habilitar(false);
+											filtro(true);
+										}else {
+											JOptionPane.showMessageDialog(null, "No es posible modificar este usuario");
+										}
+									}
+									else if(r.equals("ADMINISTRADOR")){
+										String dato5 = "PDT_EJB/Ciudad_Bean!com.servicios.Ciudad_BeanRemote";
+										Ciudad_BeanRemote ciu = (Ciudad_BeanRemote) InitialContext.doLookup(dato5);
+										Ciudad ciudad = ciu.findCiudadNombre((String) comboBox_Ciudad.getSelectedItem());
+										
+										Administrador nuevoAd = new Administrador();
+										
+										nuevoAd.setDocumento(Integer.parseInt(textCedula.getText()));
+										nuevoAd.setDomicilio(textDomicilio.getText());
+										nuevoAd.setCiudade(ciudad);
+										nuevoAd.setTelefono(Integer.parseInt(textTelefono.getText()));
+										
+										if(af.delete(afic)) {
+											nuevoAd.setUsuario(user);
+											
+											if(us.edit(user) && ad.insert(nuevoAd)) {
+												JOptionPane.showMessageDialog(null, "Usuario modificado correctamente");
+												limpiar();
+												elsee();
+												habilitar(false);
+												filtro(true);
+											}	
+										}else {
+											JOptionPane.showMessageDialog(null, "No es posible modificar este usuario");
+										}
+									}
+									else if(r.equals("INVESTIGADOR")){
+										String dato5 = "PDT_EJB/Ciudad_Bean!com.servicios.Ciudad_BeanRemote";
+										Ciudad_BeanRemote ciu = (Ciudad_BeanRemote) InitialContext.doLookup(dato5);
+										Ciudad ciudad = ciu.findCiudadNombre((String) comboBox_Ciudad.getSelectedItem());
+										
+										Investigador nuevoIn = new Investigador();
+										
+										nuevoIn.setDocumento(Integer.parseInt(textCedula.getText()));
+										nuevoIn.setDomicilio(textDomicilio.getText());
+										nuevoIn.setCiudade(ciudad);
+										nuevoIn.setTelefono(Integer.parseInt(textTelefono.getText()));
+										
+										if(af.delete(afic)) {
+											nuevoIn.setUsuario(user);
+											
+											if(us.edit(user) && i.insert(nuevoIn)) {
+												JOptionPane.showMessageDialog(null, "Usuario modificado correctamente");
+												limpiar();
+												elsee();
+												habilitar(false);
+												filtro(true);
+											}	
+										}else {
+											JOptionPane.showMessageDialog(null, "No es posible modificar este usuario");
+										}
+									}
+								}
+								
+								filtro(true);
+								
+							}
+						}
+						
+					} catch (NamingException | ServiciosException e1) {
+						JOptionPane.showMessageDialog(null, "lo rompiste we");
+
+						e1.printStackTrace();
+					}
+					
 				}
 			}
 			
 		});
+		comboBox_Ciudad = new JComboBox<Object>();
+		comboBox_Ciudad.setFont(new Font("Baskerville Old Face", Font.PLAIN, 14));
+		comboBox_Ciudad.setBackground(SystemColor.menu);
+		comboBox_Ciudad.setBounds(124, 400, 204, 25);
+		panel_1.add(comboBox_Ciudad);
+		comboBox_Ciudad.addItemListener(new ItemListener() {
+
+			public void itemStateChanged(ItemEvent e) {
+				if(comboBox_Ciudad.getSelectedItem().equals("")) {
+					comboBox_Ciudad.setBackground(new Color(255, 228, 225));
+				}
+				else {
+					comboBox_Ciudad.setBackground(new Color(240, 255, 240));
+				}
+			}
+			
+		});
+		comboBox_Ciudad.addItem("");
 		
-		btnEliminarUsuario = new JButton("Eliminar Usuario");
-		btnEliminarUsuario.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnEliminarUsuario.setBackground(SystemColor.menu);
-		btnEliminarUsuario.setBounds(10, 606, 318, 31);
-		panel_1.add(btnEliminarUsuario);
+		List<Ciudad> allCiudades = new LinkedList<>();
+		try {
+			String dato3 = "PDT_EJB/Ciudad_Bean!com.servicios.Ciudad_BeanRemote";
+			Ciudad_BeanRemote de = (Ciudad_BeanRemote) InitialContext.doLookup(dato3);
+			allCiudades = de.allCiudades();
+			
+		} catch(NamingException ex) {
+			ex.getMessage();
+		}
+		for(Ciudad c : allCiudades) {
+			comboBox_Ciudad.addItem(c.getNombre());
+		}
+		comboBox_Ciudad.setVisible(false);
 		
 		
 		lblCampoCorreo = new JLabel("Debe contener @ y .com");
@@ -685,7 +854,7 @@ public class Listado_Usuarios extends JPanel {
 		lblCampoCorreo.setBounds(53, 210, 275, 19);
 		panel_1.add(lblCampoCorreo);
 
-		lblCampoCedula = new JLabel("Cédula sin puntos o guiones. Formato: 12345678");
+		lblCampoCedula = new JLabel("C\u00E9dula sin puntos o guiones. Formato: 12345678");
 		lblCampoCedula.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblCampoCedula.setForeground(Color.GRAY);
 		lblCampoCedula.setFont(new Font("Baskerville Old Face", Font.PLAIN, 12));
@@ -693,7 +862,7 @@ public class Listado_Usuarios extends JPanel {
 		panel_1.add(lblCampoCedula);
 		lblCampoCedula.setVisible(false);
 
-		lblCampoTelefono = new JLabel("Teléfono solo numérico");
+		lblCampoTelefono = new JLabel("Tel\u00E9fono solo num\u00E9rico");
 		lblCampoTelefono.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblCampoTelefono.setForeground(Color.GRAY);
 		lblCampoTelefono.setFont(new Font("Baskerville Old Face", Font.PLAIN, 12));
@@ -760,58 +929,125 @@ public class Listado_Usuarios extends JPanel {
 					
 					JOptionPane.showMessageDialog(null, "Cédula debe contener solo números");
 					
-					cedula = false;
-
 				}
 					
 				if(8 <= textCedula.getText().length()) {
 					lblMaximo.setVisible(true);
+					
 					evt.consume();
 					
-					cedula = true;
+					if(!isCedula()) {
+						JOptionPane.showMessageDialog(null, "La Cédula ingresada es incorrecta");
+						
+						textCedula.setBackground(new Color(255, 228, 225));
+					}
+					else {
+						int ci = Integer.parseInt(textCedula.getText());
+						
+						if(existeInveAdmin(ci, Long.parseLong(textId.getText()))) {
 
+							JOptionPane.showMessageDialog(null, "La Cédula ingresada ya existe en el sistema!");							
+							textCedula.setBackground(new Color(255, 228, 225));
+						}
+						else{
+							textCedula.setBackground(new Color(240, 255, 240));
+						}
+					}
 				}
 				
-				if (textCedula.getText().length() < 8){
+				else if (textCedula.getText().length() < 8){
 					lblMaximo.setVisible(true);
 					
-					cedula = false;
-
+					textCedula.setBackground(new Color(255, 228, 225));
 				}
 				
-				if(!(textCedula.getText().equals(""))) {
-					
-					cedula = true;	
+				if((textCedula.getText().equals(""))) {
+					textCedula.setBackground(new Color(255, 228, 225));
 				}
-				else {
-					cedula = false;
-				}
-				
-				habilitarBoton();
-
 			}
 
 			public void keyPressed(KeyEvent e) {
-				habilitarBoton();
 
 			}
 			public void keyReleased(KeyEvent e) {
-				if(textCedula.getText().length() == 8) {
-					lblMaximo.setVisible(false);
+				if (textCedula.getText().length() < 8){
+					lblMaximo.setVisible(true);
+					textCedula.setBackground(new Color(255, 228, 225));
+					
+				}
+				
+				else if(textCedula.getText().length() == 8) {
+					lblMaximo.setVisible(true);
 					e.consume();
 					
-					cedula = true;
-
+					if(!isCedula()) {
+						JOptionPane.showMessageDialog(null, "La Cédula ingresada es incorrecta");
+						textCedula.setBackground(new Color(255, 228, 225));
+					}
+					else {
+						
+						int ci = Integer.parseInt(textCedula.getText());
+						
+						if(existeInveAdmin(ci, Long.parseLong(textId.getText()))) {
+							JOptionPane.showMessageDialog(null, "La Cédula ingresada ya existe en el sistema!");
+							textCedula.setBackground(new Color(255, 228, 225));
+							
+						}
+						else{
+							textCedula.setBackground(new Color(240, 255, 240));
+							lblMaximo.setVisible(false);
+						}
+					}
 				}
-				habilitarBoton();
-
 			}
 		});
-		
-		separator = new JSeparator();
-		separator.setBounds(10, 39, 214, 2);
-		panel.add(separator);
-		
+		textCedula.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusGained(FocusEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (textCedula.getText().length() < 8){
+					lblMaximo.setVisible(true);
+					textCedula.setBackground(new Color(255, 228, 225));
+
+				}
+				else if(textCedula.getText().length() == 8) {
+					lblMaximo.setVisible(false);
+					
+					if(!isCedula()) {
+						textCedula.setBackground(new Color(255, 228, 225));
+
+					}
+					else {
+						textCedula.setBackground(new Color(240, 255, 240));
+
+					}
+
+				}
+				if(!(textCedula.getText().equals(""))) {
+					int ci = Integer.parseInt(textCedula.getText());
+					if(existeInveAdmin(ci, Long.parseLong(textId.getText()))) {							
+						JOptionPane.showMessageDialog(null, "La Cédula ingresada ya existe en el sistema!");
+
+						textCedula.setBackground(new Color(255, 228, 225));
+
+					}
+					else {
+						textCedula.setBackground(new Color(240, 255, 240));
+
+					}
+				}
+				else {
+					textCedula.setBackground(new Color(255, 228, 225));
+
+				}
+			}			
+		});
 		lblFiltro = new JLabel("Filtrar por:");
 		lblFiltro.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
 		lblFiltro.setBounds(20, 63, 170, 25);
@@ -828,13 +1064,35 @@ public class Listado_Usuarios extends JPanel {
 				DefaultTableModel model = new DefaultTableModel();
 				if(comboBox.getSelectedItem().equals("") || comboBox.getSelectedItem().equals("Nombre") || comboBox.getSelectedItem().equals("Apellido") || comboBox.getSelectedItem().equals("Nombre de Usuario")) {
 					textFiltro.setText("");
+					DefaultTableModel modelo = new DefaultTableModel();
+					
+					Object[] columns = {"Nombre", "Apellido", "E-mail", "Nombre de Usuario", "Rol de Usuario"};
+					
+					modelo.setColumnIdentifiers(columns);
+					
+					Object [] fila = new Object[columns.length];
+					table.setModel(modelo);
+					
+					List<Usuario> usuarios = new LinkedList<>();
+					
+					Tipo_Rol tipo = null;
+					
+					try {
+						String dato = "PDT_EJB/Usuario_Bean!com.servicios.Usuario_BeanRemote";
+						Usuario_BeanRemote us = (Usuario_BeanRemote) InitialContext.doLookup(dato);
+						
+						usuarios = us.allUsuarios();
+						listarUsuario(usuarios, fila, modelo, tipo);
+						
+					}catch (NamingException x) {
+						x.printStackTrace();
+					}
 				}
 				else {
 					comboBox_Rol.setSelectedItem("");
 				}
 				comboBox.setSelectedItem("");
 				model.setNumRows(0);
-				listarTodo();
 			}
 			
 		});
@@ -848,97 +1106,8 @@ public class Listado_Usuarios extends JPanel {
 
 			public void actionPerformed(ActionEvent e) {
 				if(textFiltro.isVisible() == true || comboBox_Rol.isVisible() == true) {
-					
-					DefaultTableModel model = new DefaultTableModel() {
-						/**
-						 * 
-						 */
-						private static final long serialVersionUID = 1L;
-
-						public boolean isCellEditable(int row, int column) {
-							return false;
-						}
-					};
-					Object[] columns = {"Nombre", "Apellido", "E-mail", "Nombre de Usuario", "Rol de Usuario"};
-					
-					model.setColumnIdentifiers(columns);
-					
-					Object [] fila = new Object[columns.length];
-					table.setModel(model);
-					
-					LinkedList<Usuario> usuarios = new LinkedList<>();
-					
-					if(comboBox.getSelectedItem().equals("Nombre")) {
-						if(!textFiltro.getText().isEmpty()) {
-							String n = textFiltro.getText();
-							
-							usuarios = DAO_Usuario.findUsuarioNombre(n);
-							if(usuarios.size() != 0) {
-								listarUsuario(usuarios, fila,  model, null);
-							}
-							else {
-								JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
-							}
-						}
-						else {
-							JOptionPane.showMessageDialog(null, "Por favor, escriba un Nombre");
-						}
-					}
-					else if(comboBox.getSelectedItem().equals("Apellido")) {
-						if(!textFiltro.getText().isEmpty()) {
-							String n = textFiltro.getText();
-							
-							usuarios = DAO_Usuario.findUsuarioApellido(n);
-							if(usuarios.size() != 0) {
-								listarUsuario(usuarios, fila,  model, null);
-							}
-							else {
-								JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
-							}
-						}
-						else {
-							JOptionPane.showMessageDialog(null, "Por favor, escriba un Apellido");
-						}
-					}
-					else if(comboBox.getSelectedItem().equals("Nombre de Usuario")) {
-						if(!textFiltro.getText().isEmpty()) {
-							String n = textFiltro.getText();
-							
-							usuarios = DAO_Usuario.findUsuarioNombre(n);
-							if(usuarios.size() != 0) {
-								listarUsuario(usuarios, fila,  model, null);
-							}
-							else {
-								JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
-							}
-						}
-						else {
-							JOptionPane.showMessageDialog(null, "Por favor, escriba un Nombre de Usuario");
-						}
-					}
-					
-					else if(comboBox.getSelectedItem().equals("Rol de Usuario")) {
-						if(comboBox_Rol.getSelectedItem().equals("")) {
-							JOptionPane.showMessageDialog(null, "Por favor, eliga un rol de usuario");
-						}
-						else {
-							usuarios = DAO_Usuario.findAll();
-							
-							if(comboBox_Rol.getSelectedItem().equals("ADMINISTRADOR")) {
-								listarUsuario(usuarios, fila,  model, Tipo.ADMINISTRADOR);
-							}
-							else if (comboBox_Rol.getSelectedItem().equals("INVESTIGADOR")) {
-								listarUsuario(usuarios, fila,  model,  Tipo.INVESTIGADOR);
-							}
-							else if(comboBox_Rol.getSelectedItem().equals("AFICIONADO")) {
-								listarUsuario(usuarios, fila,  model,  Tipo.AFICIONADO);
-							}
-						}
-					}
-					else {
-						JOptionPane.showMessageDialog(null, "Por favor, eliga un filtro para comenzar");
-					}
-				}
+					filtro(false);
+				}	
 			}
 		});
 		
@@ -984,107 +1153,330 @@ public class Listado_Usuarios extends JPanel {
 			comboBox_Rol.addItem(s);
 		} 
 		
-		lblSeleccione = new JLabel("Seleccione un registro para realizar alguna modificación, eliminacion o para ver los datos completos del mismo");
+		comboBox_Rol2.addItemListener(new ItemListener(){
+			
+			//Control de campos: aparecerán solo los que correspondan
+			public void  itemStateChanged(ItemEvent e) {
+				String a = (String) comboBox_Rol2.getSelectedItem();
+				if(a.equals("ADMINISTRADOR") || a.equals("INVESTIGADOR")) {
+					textCedula.setVisible(true);
+					lblCedula.setVisible(true);
+					lblCiudad.setVisible(true);
+					comboBox_Ciudad.setVisible(true);
+					textTelefono.setVisible(true);
+					lblTelefono.setVisible(true);
+					textOcupacion.setVisible(false);
+					lblOcupacion.setVisible(false);
+					textDomicilio.setVisible(true);
+					lblDomicilio.setVisible(true);
+
+					
+					lbl1.setVisible(true);
+					lbl2.setVisible(true);
+					lbl3.setVisible(true);
+					lbl4.setVisible(true);
+					
+					lblCampoCedula.setVisible(true);
+					lblCampoTelefono.setVisible(true);
+
+				}
+				else if(a.equals("AFICIONADO")){
+					textCedula.setVisible(false);
+					lblCedula.setVisible(false);
+					lblCiudad.setVisible(false);
+					comboBox_Ciudad.setVisible(false);
+					textTelefono.setVisible(false);
+					lblTelefono.setVisible(false);
+					textOcupacion.setVisible(true);
+					lblOcupacion.setVisible(true);
+					textDomicilio.setVisible(false);
+					lblDomicilio.setVisible(false);
+					
+					lbl1.setVisible(true);
+					lbl2.setVisible(false);
+					lbl3.setVisible(false);
+					lbl4.setVisible(false);
+
+					lblCampoCedula.setVisible(false);
+					lblCampoTelefono.setVisible(false);
+					lblMaximo.setVisible(false);
+
+
+				}
+				else {
+					textCedula.setVisible(false);
+					lblCedula.setVisible(false);
+					lblCiudad.setVisible(false);
+					comboBox_Ciudad.setVisible(false);
+					textTelefono.setVisible(false);
+					lblTelefono.setVisible(false);
+					textOcupacion.setVisible(false);
+					lblOcupacion.setVisible(false);
+					textDomicilio.setVisible(false);
+					lblDomicilio.setVisible(false);
+					
+					lbl1.setVisible(false);
+					lbl2.setVisible(false);
+					lbl3.setVisible(false);
+					lbl4.setVisible(false);
+					
+					lblCampoCedula.setVisible(false);
+					lblCampoTelefono.setVisible(false);
+					lblMaximo.setVisible(false);
+
+
+				}
+
+			}
+		});
+		
+		lblSeleccione = new JLabel("Seleccione un registro para realizar alguna modificaci\u00F3n, eliminacion o para ver los datos completos del mismo");
 		lblSeleccione.setHorizontalAlignment(SwingConstants.TRAILING);
 		lblSeleccione.setFont(new Font("Arial", Font.PLAIN, 10));
 		lblSeleccione.setForeground(Color.DARK_GRAY);
 		lblSeleccione.setBounds(20, 144, 607, 25);
 		panel.add(lblSeleccione);
-	}
-	
-	public void actualizarAdministrador() {
-		Administrador a = new Administrador();
-		a.setNombre(textNombre.getText());
-		a.setApellido(textApellido.getText());
-		a.setMail(textCorreo.getText());
-		String cedulaST = textCedula.getText();
-		int cedula = Integer.parseInt(cedulaST);
-		a.setDocumento(cedula);
-		String ciudadST = comboBox_Ciudad.getSelectedItem().toString();
-		Ciudad c = new Ciudad();
-		c.setNombre(ciudadST);
-		a.setCiudad(c);
-		a.setDomicilio(textDomicilio.getText());
-		String telefonoST = textTelefono.getText();
-		int telefono = Integer.parseInt(telefonoST);
-		a.setTelefono(telefono);
-		Usuario u = DAO_Usuario.findUsuarioMail(textCorreo.getText());
-		int id = u.getIdUsuario();
-		Administrador adm = DAO_Administrador.findUsuarioID(id);
-		int idAdm = adm.getIdAdministrador();
 		
-		int respuesta = JOptionPane.showConfirmDialog(null, "¿Realmente quieres actualizar los datos de este usuario?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if(respuesta == JOptionPane.YES_OPTION) {
-			DAO_Usuario.edit(a, id);
-			DAO_Administrador.edit(a, idAdm);
-		if(DAO_Usuario.edit(a, id) && DAO_Administrador.edit(a, idAdm)) {
-			JOptionPane.showMessageDialog(null, "Usuario actualizado correctamente");
-			listarTodo();
-			limpiar();
-		}else {
-			JOptionPane.showMessageDialog(null, "No se ha podido actualizar los datos del usuario");
-		}
-		}
-	}
-	
-	public void actualizarInvestigador() {
-		Investigador i = new Investigador();
-		i.setNombre(textNombre.getText());
-		i.setApellido(textApellido.getText());
-		i.setMail(textCorreo.getText());
-		String cedulaST = textCedula.getText();
-		int cedula = Integer.parseInt(cedulaST);
-		i.setDocumento(cedula);
-		String ciudadST = comboBox_Ciudad.getSelectedItem().toString();
-		Ciudad c = new Ciudad();
-		c.setNombre(ciudadST);
-		i.setCiudad(c);
-		i.setDomicilio(textDomicilio.getText());
-		String telefonoST = textTelefono.getText();
-		int telefono = Integer.parseInt(telefonoST);
-		i.setTelefono(telefono);
-		Usuario u = DAO_Usuario.findUsuarioMail(textCorreo.getText());
-		int id = u.getIdUsuario();
-		Investigador inv = DAO_Investigador.findUsuarioID(id);
-		int idInv = inv.getIdInvestigador();
+
+		btnEliminarUsuario = new JButton("Eliminar Usuario");
+		btnEliminarUsuario.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnEliminarUsuario.setBackground(SystemColor.menu);
+		btnEliminarUsuario.setBounds(10, 606, 318, 31);
+		panel_1.add(btnEliminarUsuario);
+		btnEliminarUsuario.setEnabled(false);
 		
-		int respuesta = JOptionPane.showConfirmDialog(null, "¿Realmente quieres actualizar los datos de este usuario?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if(respuesta == JOptionPane.YES_OPTION) {
-			DAO_Usuario.edit(i, id);
-			DAO_Investigador.edit(i, idInv);
-		if(DAO_Usuario.edit(i, id) && DAO_Investigador.edit(i, idInv)) {
-			JOptionPane.showMessageDialog(null, "Usuario actualizado correctamente");
-			listarTodo();
-			limpiar();
-		}else {
-			JOptionPane.showMessageDialog(null, "No se ha podido actualizar los datos del usuario");
-		}
-		}
-	}
-	
-	public void actualizarAficionado() {
-		Aficionado a = new Aficionado();
-		a.setNombre(textNombre.getText());
-		a.setApellido(textApellido.getText());
-		a.setMail(textCorreo.getText());
-		a.setOcupacion(textOcupacion.getText());
-		Usuario u = DAO_Usuario.findUsuarioMail(textCorreo.getText());
-		int id = u.getIdUsuario();
-		Aficionado afi = DAO_Aficionado.findUsuarioID(id);
-		int idAfi = afi.getIdAficionado();
+		textId = new JTextField();
+		textId.setFont(new Font("Tahoma", Font.PLAIN, 7));
+		textId.setForeground(new Color(240, 248, 255));
+		textId.setBorder(null);
+		textId.setBackground(new Color(240, 248, 255));
+		textId.setEditable(false);
+		textId.setBounds(10, 95, 96, 13);
+		panel_1.add(textId);
+		textId.setColumns(10);
+		btnEliminarUsuario.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e){
+				int respuesta = JOptionPane.showConfirmDialog(null, "¿ Realmente quieres eliminar a este usuario ? Una vez hecho, no hay vuelta atrás", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+				
+				if(respuesta == JOptionPane.YES_OPTION) {	
+					try {
+						String dato = "PDT_EJB/Usuario_Bean!com.servicios.Usuario_BeanRemote";
+						Usuario_BeanRemote us = (Usuario_BeanRemote) InitialContext.doLookup(dato);
+					
+						String dato1 = "PDT_EJB/Administrador_Bean!com.servicios.Administrador_BeanRemote";
+						Administrador_BeanRemote ad = (Administrador_BeanRemote) InitialContext.doLookup(dato1);
+						
+						String dato2 = "PDT_EJB/Investigador_Bean!com.servicios.Investigador_BeanRemote";
+						Investigador_BeanRemote i = (Investigador_BeanRemote) InitialContext.doLookup(dato2);
+						
+						String dato3 = "PDT_EJB/Aficionado_Bean!com.servicios.Aficionado_BeanRemote";
+						Aficionado_BeanRemote af = (Aficionado_BeanRemote) InitialContext.doLookup(dato3);
+						
+						
+						Usuario user = us.findId(Long.parseLong(textId.getText()));
+						
+						Administrador admin = ad.findUsuario(user.getIdUsuario());
+						Investigador inves = i.findUsuario(user.getIdUsuario());
+						Aficionado afic = af.findUsuario(user.getIdUsuario());
+						
+						
+					    
+						if(admin != null) {
+							if(ad.delete(admin) && us.delete(user)) {
+								JOptionPane.showMessageDialog(null, "Usuario eliminado correctamente)");
+								limpiar();
+								habilitar(false);
+								
+							}else {
+								JOptionPane.showMessageDialog(null, "No es posible eliminar este usuario");
+							}
+						}
+						else if(inves != null) {
+							if(i.delete(inves) && us.delete(user)) {
+								JOptionPane.showMessageDialog(null, "Usuario eliminado correctamente)");
+								limpiar();
+								habilitar(false);
+								
+							}else {
+								JOptionPane.showMessageDialog(null, "No es posible eliminar este usuario");
+							}
+						}
+						else if(afic != null) {
+							if(af.delete(afic) && us.delete(user)) {
+								JOptionPane.showMessageDialog(null, "Usuario eliminado correctamente)");
+								limpiar();
+								habilitar(false);
+								
+							}else {
+								JOptionPane.showMessageDialog(null, "No es posible eliminar este usuario");
+							}
+						}
+						
+						filtro(true);
+						
+					} catch (NamingException | ServiciosException e1) {
+						e1.printStackTrace();
+					}
+					
+				}
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 		
-		int respuesta = JOptionPane.showConfirmDialog(null, "¿Realmente quieres actualizar los datos de este usuario?", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if(respuesta == JOptionPane.YES_OPTION) {
-			DAO_Usuario.edit(a, id);
-			DAO_Aficionado.edit(a, idAfi);
-		if(DAO_Usuario.edit(a, id) && DAO_Aficionado.edit(a, idAfi)) {
-			JOptionPane.showMessageDialog(null, "Usuario actualizado correctamente");
-			listarTodo();
-			limpiar();
-		}else {
-			JOptionPane.showMessageDialog(null, "No se ha podido actualizar los datos del usuario");
-		}
-		}
+
+		table.addMouseListener(new MouseListener() {
+
+			public void mouseClicked(MouseEvent e) {
+				limpiar();
+				
+				int filaSeleccionada;
+				
+				filaSeleccionada = table.getSelectedRow();
+				if(filaSeleccionada == -1) {
+					elsee();
+					btnEliminarUsuario.setEnabled(false);
+					habilitar(false);
+					
+				}else {
+					habilitar(true);
+					btnEliminarUsuario.setEnabled(true);
+
+					textNombre.setText(table.getValueAt(filaSeleccionada, 0).toString());
+					textApellido.setText(table.getValueAt(filaSeleccionada, 1).toString());
+					textCorreo.setText(table.getValueAt(filaSeleccionada, 2).toString());
+					
+					String correo = table.getValueAt(filaSeleccionada, 2).toString();
+					
+					Usuario u = null;
+					try {
+						String dato = "PDT_EJB/Usuario_Bean!com.servicios.Usuario_BeanRemote";
+						Usuario_BeanRemote us = (Usuario_BeanRemote) InitialContext.doLookup(dato);
+						
+						u = us.findUsuarioMail(correo); 
+						
+						textId.setText(String.valueOf(u.getIdUsuario()));
+						
+					} catch(NamingException | ServiciosException ex) {
+						ex.getMessage();
+					}
+					
+					
+					////////////
+					
+					Investigador inves = new Investigador();
+					
+					try {
+						String dato2 = "PDT_EJB/Investigador_Bean!com.servicios.Investigador_BeanRemote";
+						Investigador_BeanRemote in = (Investigador_BeanRemote) InitialContext.doLookup(dato2);
+						
+						inves = in.findInvestigador(u.getNombreUsuario(), u.getContraseña());
+
+					} catch(NamingException | ServiciosException ex) {
+						ex.getMessage();
+					}
+					///////////
+					
+					Aficionado afic = new Aficionado();
+					
+					try {
+						String dato3 = "PDT_EJB/Aficionado_Bean!com.servicios.Aficionado_BeanRemote";
+						Aficionado_BeanRemote af = (Aficionado_BeanRemote) InitialContext.doLookup(dato3);
+						
+						afic = af.findAficionado(u.getNombreUsuario(), u.getContraseña());
+						 
+					} catch(NamingException | ServiciosException ex) {
+						ex.getMessage();
+					}
+					
+					Administrador admins = new Administrador();
+					
+					try {
+						String dato4 = "PDT_EJB/Administrador_Bean!com.servicios.Administrador_BeanRemote";
+						Administrador_BeanRemote ad = (Administrador_BeanRemote) InitialContext.doLookup(dato4);
+						
+						admins = ad.findAdministrador(u.getNombreUsuario(), u.getContraseña()); 
+						
+						
+					} catch(NamingException | ServiciosException ex) {
+						ex.getMessage();
+					}
+					 
+					if(admins != null) {
+						inve_admin();
+						
+						textCedula.setText(String.valueOf(admins.getDocumento()));
+						comboBox_Ciudad.setSelectedItem(admins.getCiudade().getNombre());
+						comboBox_Rol2.setSelectedItem("ADMINISTRADOR");
+						textDomicilio.setText(admins.getDomicilio());
+						textTelefono.setText(String.valueOf(admins.getTelefono()));
+						
+					}else if(inves != null) {
+						inve_admin();
+						
+						textCedula.setText(String.valueOf(inves.getDocumento()));
+						comboBox_Ciudad.setSelectedItem(inves.getCiudade().getNombre());
+						comboBox_Rol2.setSelectedItem("INVESTIGADOR");
+						textDomicilio.setText(inves.getDomicilio());
+						textTelefono.setText(String.valueOf(inves.getTelefono()));
+
+					}else if(afic != null) {
+						aficionado();
+												
+						textOcupacion.setText(afic.getOcupacion());
+						comboBox_Rol2.setSelectedItem("AFICIONADO");
+
+					}
+
+					
+				}
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {	
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {				
+			}
+			
+		});
+		
+		habilitar(false);
 	}
 	
 	public void limpiar() {
@@ -1092,23 +1484,72 @@ public class Listado_Usuarios extends JPanel {
 		textApellido.setText("");
 		textCorreo.setText("");
 		
-		if(comboBox_Rol2.getSelectedItem().equals("ADMINISTRADOR") || comboBox_Rol2.getSelectedItem().equals("INVESTIGADOR")) {
+		textNombre.setBackground(Color.WHITE);
+		textApellido.setBackground(Color.WHITE);
+		textCorreo.setBackground(Color.WHITE);
+		
 			textDomicilio.setText("");
 			textCedula.setText("");
 			textTelefono.setText("");
 			comboBox_Ciudad.setSelectedItem("");
-		}
-		else if(comboBox_Rol2.getSelectedItem().equals("AFICIONADO") ) {
+			
+			textDomicilio.setBackground(Color.WHITE);
+			textCedula.setBackground(Color.WHITE);
+			textTelefono.setBackground(Color.WHITE);
+			comboBox_Ciudad.setBackground(Color.WHITE);
+		
 			textOcupacion.setText("");
-		}
+			
+			textOcupacion.setBackground(Color.WHITE);
+		
 	}
+	public void habilitar(boolean t) {
+		if(t == true) {
+			textNombre.setEnabled(true);
+			textApellido.setEnabled(true);
+			textCorreo.setEnabled(true);
+			
+			btnEliminarUsuario.setEnabled(true);
+			btnActualizarUsuario.setEnabled(true);
+			
+			comboBox_Rol2.setEnabled(true);
+			
+			if(comboBox_Rol2.getSelectedItem().equals("ADMINISTRADOR") || comboBox_Rol2.getSelectedItem().equals("INVESTIGADOR")) {
+				textDomicilio.setEnabled(true);
+				textCedula.setEnabled(true);
+				textTelefono.setEnabled(true);
+				comboBox_Ciudad.setEnabled(true);
+			}
+			else if(comboBox_Rol2.getSelectedItem().equals("AFICIONADO") ) {
+				textOcupacion.setEnabled(true);
+			}
+		}
+		else {
+			textNombre.setEnabled(false);
+			textApellido.setEnabled(false);
+			textCorreo.setEnabled(false);
+			
+			btnEliminarUsuario.setEnabled(false);
+			btnActualizarUsuario.setEnabled(false);
 
-	public void habilitarBoton() {
-		// TODO Auto-generated method stub
+			comboBox_Rol2.setEnabled(false);
+						
+			if(comboBox_Rol2.getSelectedItem().equals("ADMINISTRADOR") || comboBox_Rol2.getSelectedItem().equals("INVESTIGADOR")) {
+				textDomicilio.setEnabled(false);
+				textCedula.setEnabled(false);
+				textTelefono.setEnabled(false);
+				comboBox_Ciudad.setEnabled(false);
+			}
+			else if(comboBox_Rol2.getSelectedItem().equals("AFICIONADO") ) {
+				textOcupacion.setEnabled(false);
+			}
+		}
 		
 	}
 
-	public void listarUsuario(LinkedList<Usuario> usuarios, Object[] fila, DefaultTableModel model, Tipo tipo) {
+	
+
+	public void listarUsuario(List<Usuario> usuarios, Object[] fila, DefaultTableModel model, Tipo_Rol tipo) {
 		for (Usuario u: usuarios){
 			
 			String n = u.getNombre();
@@ -1116,25 +1557,56 @@ public class Listado_Usuarios extends JPanel {
 			String e = u.getMail();
 			String nu = u.getNombreUsuario();
 			
-			Investigador inve = DAO_Investigador.findInvestigador(u.getNombreUsuario(), u.getContrasenia());
+			Administrador admin = null;
 			
-			Administrador admin = DAO_Administrador.findAdministrador(u.getNombreUsuario(), u.getContrasenia());
+			try {
+				String dato = "PDT_EJB/Administrador_Bean!com.servicios.Administrador_BeanRemote";
+				Administrador_BeanRemote ad = (Administrador_BeanRemote) InitialContext.doLookup(dato);
+				
+				admin = ad.findAdministrador(u.getNombreUsuario(), u.getContraseña()); 
+				
+				
+			} catch(NamingException | ServiciosException ex) {
+				ex.getMessage();
+			}
+			////////////
+			
+			Investigador inves = null;
+			
+			try {
+				String dato2 = "PDT_EJB/Investigador_Bean!com.servicios.Investigador_BeanRemote";
+				Investigador_BeanRemote in = (Investigador_BeanRemote) InitialContext.doLookup(dato2);
+				
+				inves = in.findInvestigador(u.getNombreUsuario(), u.getContraseña());
 
-			Aficionado afic = DAO_Aficionado.findAficionado(u.getNombreUsuario(), u.getContrasenia());
-
+			} catch(NamingException | ServiciosException ex) {
+				ex.getMessage();
+			}
+			///////////
+			
+			Aficionado afic = null;
+			
+			try {
+				String dato3 = "PDT_EJB/Aficionado_Bean!com.servicios.Aficionado_BeanRemote";
+				Aficionado_BeanRemote af = (Aficionado_BeanRemote) InitialContext.doLookup(dato3);
+				
+				afic = af.findAficionado(u.getNombreUsuario(), u.getContraseña());
+				 
+			} catch(NamingException | ServiciosException ex) {
+				ex.getMessage();
+			}
+			
 			String r = "";
 			
 			if(tipo == null) {
-				if(inve != null) {
-				r = inve.getTipo().toString();
+				if(inves != null) {
+					r = Tipo_Rol.INVESTIGADOR.toString();
 				}
 				else if (admin != null) {
-					r = admin.getTipo().toString();
-	
+					r = Tipo_Rol.ADMINISTRADOR.toString();	
 				}
 				else if (afic != null) {
-					r = afic.getTipo().toString();
-					
+					r = Tipo_Rol.AFICIONADO.toString();					
 				}
 				
 				fila[0] = n;
@@ -1150,17 +1622,17 @@ public class Listado_Usuarios extends JPanel {
 					fila[1] = a;
 					fila[2] = e;
 					fila[3] = nu;
-					fila[4] = admin.getTipo().toString();
+					fila[4] = Tipo_Rol.ADMINISTRADOR.toString();
 					model.addRow(fila); 
 				}	
 			}
 			else if(tipo.toString().equals("INVESTIGADOR")) {
-				if (inve != null) {
+				if (inves != null) {
 					fila[0] = n;
 					fila[1] = a;
 					fila[2] = e;
 					fila[3] = nu;
-					fila[4] = inve.getTipo().toString();
+					fila[4] = Tipo_Rol.INVESTIGADOR.toString();
 					model.addRow(fila); 
 				}	
 			}
@@ -1170,7 +1642,7 @@ public class Listado_Usuarios extends JPanel {
 					fila[1] = a;
 					fila[2] = e;
 					fila[3] = nu;
-					fila[4] = afic.getTipo().toString();
+					fila[4] = Tipo_Rol.AFICIONADO.toString();
 					model.addRow(fila); 
 				}	
 			}
@@ -1200,14 +1672,30 @@ public class Listado_Usuarios extends JPanel {
 	public static boolean isLetra(char validar, KeyEvent evt) {
 		if(!(Character.isAlphabetic(validar)) && validar != KeyEvent.VK_BACK_SPACE && validar != KeyEvent.VK_SPACE) {
 			evt.consume();
+			
 			return false;
 		}
 		return true;
 	}
-	public boolean existeUsuario(String mail) {
+	public boolean existeUsuario(String mail, long id) {
 		
-		Usuario user = DAO_Usuario.findUsuarioMail(mail);
+
+		Usuario user = null;
+		
+		try {
+			String dato3 = "PDT_EJB/Usuario_Bean!com.servicios.Usuario_BeanRemote";
+			Usuario_BeanRemote af = (Usuario_BeanRemote) InitialContext.doLookup(dato3);
+			
+			user = af.findUsuarioMail(mail);
+			 
+		} catch(NamingException | ServiciosException ex) {
+			ex.getMessage();
+		}
+		
 		if(user==null) {
+			return false;
+		}
+		else if(user.getIdUsuario() == id) {
 			return false;
 		}
 		else {
@@ -1235,7 +1723,6 @@ public class Listado_Usuarios extends JPanel {
 		lblCampoTelefono.setVisible(false);
 		lblMaximo.setVisible(false);
 		
-		rol = true;
 	}
 	public void inve_admin(){
 		textCedula.setVisible(true);
@@ -1258,9 +1745,9 @@ public class Listado_Usuarios extends JPanel {
 		lblCampoCedula.setVisible(true);
 		lblCampoTelefono.setVisible(true);
 
-		rol = true;
 	}
 	public void elsee() {
+
 		textCedula.setVisible(false);
 		lblCedula.setVisible(false);
 		lblCiudad.setVisible(false);
@@ -1281,57 +1768,237 @@ public class Listado_Usuarios extends JPanel {
 		lblCampoTelefono.setVisible(false);
 		lblMaximo.setVisible(false);
 
-		rol = false;
 	}
-	
-	public void listarTodo(){
-		
-		DefaultTableModel model = new DefaultTableModel();
-		Object[] columns = {"Nombre", "Apellido", "E-mail", "Nombre de Usuario", "Rol de Usuario"};
-		
-		model.setColumnIdentifiers(columns);
-		
-		Object [] fila = new Object[columns.length];
-		table.setModel(model);
-		
-		LinkedList<Usuario> usuarios = DAO_Usuario.findAll();
-		
-		for (Usuario u: usuarios){
-			
-			String n = u.getNombre();
-			String a = u.getApellido();
-			String e = u.getMail();
-			String nu = u.getNombreUsuario();
-			
-			Investigador inve = DAO_Investigador.findInvestigador(u.getNombreUsuario(), u.getContrasenia());
-			
-			Administrador admin = DAO_Administrador.findAdministrador(u.getNombreUsuario(), u.getContrasenia());
 
-			Aficionado afic = DAO_Aficionado.findAficionado(u.getNombreUsuario(), u.getContrasenia());
-
-			String r = "";
-			
+	public static boolean existeInveAdmin(int cedula, long id) {
 		
-			if(inve != null) {
-				r = inve.getTipo().toString();
+		boolean existe = false;
+		
+		Administrador admin = null;
+		
+		try {
+			String dato = "PDT_EJB/Administrador_Bean!com.servicios.Administrador_BeanRemote";
+			Administrador_BeanRemote ad = (Administrador_BeanRemote) InitialContext.doLookup(dato);
+			admin = ad.findAdministradorCedula(cedula);
+
+		} catch(NamingException | ServiciosException ex) {
+			ex.getMessage();
+		}
+		
+		Investigador inve = null;
+		
+		try {
+			String dato2 = "PDT_EJB/Investigador_Bean!com.servicios.Investigador_BeanRemote";
+			Investigador_BeanRemote in = (Investigador_BeanRemote) InitialContext.doLookup(dato2);
+			inve = in.findInvestigadorCedula(cedula);
+
+		} catch(NamingException | ServiciosException ex) {
+			ex.getMessage();
+		}
+		
+		if(admin != null) {
+			if(admin.getUsuario().getIdUsuario() == id){
+				existe = false;
 			}
-			else if (admin != null) {
-				r = admin.getTipo().toString();
-
+			else {
+				existe = true;
 			}
-			else if (afic != null) {
-				r = afic.getTipo().toString();
+			
+		}
+		else if (inve != null){
+			if(inve.getUsuario().getIdUsuario() == id) {
+				existe = false;
+			}
+			else {
+				existe = true;
+			}
+		}	
+		return existe;
+	}
+	public boolean isCedula() {
+		
+		int correcto=0;
+		String ced=textCedula.getText().trim();
+				
+		int cedula[]; // Vector donde van a estar los digitos de la cedula
+		int factor[] = {8,1,2,3,4,7,6,0};// factor a multiplicar
+		
+		cedula = new int[8];
+		
+		int suma=0;
+		
+		
+		for(int i=0;i<ced.length();i++){
+			if(ced.charAt(i) == '0' || ced.charAt(i)== '1' || ced.charAt(i)=='2' 
+               || ced.charAt(i)== '3' || ced.charAt(i) == '4' || ced.charAt(i)== '5' || ced.charAt(i)=='6' 
+              || ced.charAt(i) == '7' || ced.charAt(i)== '8' || ced.charAt(i)=='9'){
+				correcto++;
+				cedula[i]=Integer.parseInt("" +ced.charAt(i));
+				 
+				suma = suma + (cedula[i]*factor[i]);
 				
 			}
+		}
+		
+		if (correcto!=8){
+			return false;
 			
-			fila[0] = n;
-			fila[1] = a;
-			fila[2] = e;
-			fila[3] = nu;
-			fila[4] = r;
-			model.addRow(fila); 
+		} else {
+			// Caso de ingreso correcto 
 			
-	
+			int resto=suma%10;
+			if (resto == cedula[7]) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
+	public void filtro(Boolean tod) {
+			
+			DefaultTableModel model = new DefaultTableModel() {
+				/**
+				 * 
+				 */
+				private static final long serialVersionUID = 1L;
+
+				public boolean isCellEditable(int row, int column) {
+					return false;
+				}
+			};
+			Object[] columns = {"Nombre", "Apellido", "E-mail", "Nombre de Usuario", "Rol de Usuario"};
+			
+			model.setColumnIdentifiers(columns);
+			
+			Object [] fila = new Object[columns.length];
+			table.setModel(model);
+			
+			List<Usuario> usuarios = new LinkedList<>();
+			
+			String dato3 = "PDT_EJB/Usuario_Bean!com.servicios.Usuario_BeanRemote";
+
+			if(comboBox.getSelectedItem().equals("Nombre")) {
+
+				if(!textFiltro.getText().isEmpty()) {
+					String n = textFiltro.getText();
+					
+					try {
+						Usuario_BeanRemote us = (Usuario_BeanRemote) InitialContext.doLookup(dato3);
+						
+						usuarios = us.findUsuarioNombre(n);
+						estado = "Nombre";
+						
+					} catch(NamingException | ServiciosException ex) {
+						ex.getMessage();
+					}
+					
+					if(usuarios.size() != 0) {
+						listarUsuario(usuarios, fila,  model, null);
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
+					}
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Por favor, escriba un Nombre");
+				}
+			}
+			else if(comboBox.getSelectedItem().equals("Apellido")) {
+				if(!textFiltro.getText().isEmpty()) {
+					String a = textFiltro.getText();
+					
+					try {
+						Usuario_BeanRemote us = (Usuario_BeanRemote) InitialContext.doLookup(dato3);
+						
+						usuarios = us.findUsuarioApellido(a);
+						estado = "Apellido";
+						 
+					} catch(NamingException | ServiciosException ex) {
+						ex.getMessage();
+					}
+					
+					if(usuarios.size() != 0) {
+						listarUsuario(usuarios, fila,  model, null);
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
+					}
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Por favor, escriba un Apellido");
+				}
+			}
+			else if(comboBox.getSelectedItem().equals("Nombre de Usuario")) {
+				if(!textFiltro.getText().isEmpty()) {
+					String u = textFiltro.getText();
+					
+					try {
+						Usuario_BeanRemote us = (Usuario_BeanRemote) InitialContext.doLookup(dato3);
+						
+						usuarios = us.findUsuarioNombreUsuario(u);
+						estado = "Nombre Usuario";
+						
+					} catch(NamingException | ServiciosException ex) {
+						ex.getMessage();
+					}
+					
+					if(usuarios.size() != 0) {
+						listarUsuario(usuarios, fila,  model, null);
+					}
+					else {
+						JOptionPane.showMessageDialog(null, "No existen resultados compatibles");
+					}
+				}
+				else {
+					JOptionPane.showMessageDialog(null, "Por favor, escriba un Nombre de Usuario");
+				}
+			}
+			
+			else if(comboBox.getSelectedItem().equals("Rol de Usuario")) {
+				if(comboBox_Rol.getSelectedItem().equals("")) {
+					JOptionPane.showMessageDialog(null, "Por favor, eliga un rol de usuario");
+				}
+				else {
+					try {
+						Usuario_BeanRemote us = (Usuario_BeanRemote) InitialContext.doLookup(dato3);
+						
+						usuarios = us.allUsuarios();
+						estado = "Rol";
+						
+					} catch(NamingException ex) {
+						ex.getMessage();
+					}
+					
+					if(comboBox_Rol.getSelectedItem().equals("ADMINISTRADOR")) {
+						listarUsuario(usuarios, fila,  model, Tipo_Rol.ADMINISTRADOR);
+					}
+					else if (comboBox_Rol.getSelectedItem().equals("INVESTIGADOR")) {
+						listarUsuario(usuarios, fila,  model,  Tipo_Rol.INVESTIGADOR);
+					}
+					else if(comboBox_Rol.getSelectedItem().equals("AFICIONADO")) {
+						listarUsuario(usuarios, fila,  model,  Tipo_Rol.AFICIONADO);
+					}
+				}
+			}
+			else {
+				if(tod == false)
+					JOptionPane.showMessageDialog(null, "Por favor, eliga un filtro para comenzar");
+				
+				else {
+					Usuario_BeanRemote us;
+					
+					try {
+						us = (Usuario_BeanRemote) InitialContext.doLookup(dato3);
+						usuarios = us.allUsuarios();
+						
+						listarUsuario(usuarios, fila,  model, null);
+						
+					} catch (NamingException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+	}
 }
+
+	

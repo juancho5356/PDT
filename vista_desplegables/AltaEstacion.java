@@ -1,4 +1,4 @@
-package Vista.vista_desplegables;
+package vista_desplegables;
 
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -10,18 +10,26 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import Modelo.Investigador;
+import com.servicios.Departamento_BeanRemote;
+import com.servicios.EstacionDeMedicion_BeanRemote;
+import com.servicios.Investigador_BeanRemote;
+import com.exception.*;
+
+import model.Departamento;
+import model.EstacionesDeMedicion;
+import model.Investigador;
 
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
+import java.util.List;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import Controlador.*;
-import Modelo.*;
-import Vista.vista.*;
+import vista.LogIn;
 
 import javax.swing.JSeparator;
 
@@ -83,7 +91,7 @@ public class AltaEstacion extends JPanel {
 		lblUser.setBounds(710, 158, 239, 23);
 		panel.add(lblUser);
 		
-		lblNewLabel = new JLabel("Alta de EstaciÃ³n");
+		lblNewLabel = new JLabel("Alta de Estación");
 		lblNewLabel.setFont(new Font("Baskerville Old Face", Font.ITALIC, 27));
 		lblNewLabel.setBounds(55, 87, 275, 31);
 		panel.add(lblNewLabel);
@@ -144,10 +152,22 @@ public class AltaEstacion extends JPanel {
 		textUser.setColumns(10);
 		textUser.setBounds(710, 156, 239, 25);
 		panel.add(textUser);
-		Investigador inves = DAO_Investigador.findInvestigador(LogIn.textUsuario.getText(), String.valueOf(LogIn.password.getPassword()));
+		Investigador inves = null;
 		
-		if(inves != null)
-		textUser.setText(inves.getNombre()+" "+ inves.getApellido());
+		try {
+			String dato2 = "PDT_EJB/Investigador_Bean!com.servicios.Investigador_BeanRemote";
+			Investigador_BeanRemote i = (Investigador_BeanRemote) InitialContext.doLookup(dato2);
+			
+			inves = i.findInvestigador(LogIn.textUsuario.getText(), String.valueOf(LogIn.password.getPassword()));
+			
+			if(inves != null)
+				textUser.setText(inves.getUsuario().getNombre()+" "+ inves.getUsuario().getApellido());
+			
+		} catch(NamingException | ServiciosException ex) {
+			ex.getMessage();
+		}
+		
+		
 		
 		lblUsuario = new JLabel("Investigador");
 		lblUsuario.setFont(new Font("Baskerville Old Face", Font.PLAIN, 16));
@@ -166,7 +186,16 @@ public class AltaEstacion extends JPanel {
 		panel.add(comboBox_Departamento);
 		comboBox_Departamento.addItem("");
 		
-		LinkedList<Departamento> departamentos = DAO_Departamento.allDepartamentos();
+		List<Departamento> departamentos = new LinkedList<>();
+		
+		try {
+			String dato3 = "PDT_EJB/Departamento_Bean!com.servicios.Departamento_BeanRemote";
+			Departamento_BeanRemote de = (Departamento_BeanRemote) InitialContext.doLookup(dato3);
+			departamentos = de.allDepartamentos();
+			
+		} catch(NamingException ex) {
+			ex.getMessage();
+		}
 		
 		for(Departamento d: departamentos) {
 			comboBox_Departamento.addItem(d.getNombre());
@@ -214,12 +243,7 @@ public class AltaEstacion extends JPanel {
 		btnLimpiar.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
-				textNombre.setText("");
-				textLatitud.setText("");
-				textLongitud.setText("");
-				textHumedad.setText("");
-				textCalidad.setText("");
-				comboBox_Departamento.setSelectedItem("");
+				limpiar();
 			}
 			
 		});
@@ -238,26 +262,64 @@ public class AltaEstacion extends JPanel {
 					String hu = textHumedad.getText();
 					
 					String d = (String) comboBox_Departamento.getSelectedItem();
-					Departamento depa = DAO_Departamento.findDepartamento(d);
-					
-					Investigador investigador = DAO_Investigador.findInvestigador(LogIn.textUsuario.getText(), String.valueOf(LogIn.password.getPassword()));
-
-					if(investigador != null) {
-						Estacion_Medicion estacion = new Estacion_Medicion(n,la,lo,ca,hu,inves,depa);
+					Departamento depa = null;
+					try {
+						String dato3 = "PDT_EJB/Departamento_Bean!com.servicios.Departamento_BeanRemote";
+						Departamento_BeanRemote de = (Departamento_BeanRemote) InitialContext.doLookup(dato3);
+						depa = de.findDepartamento(d);
 						
-						if(DAO_Estacion_Medicion.insert(estacion)) {
-							JOptionPane.showMessageDialog(null, "Estacion de Medicion ingresada al sistema");
+					} catch(NamingException | ServiciosException ex) {
+						ex.getMessage();
+					}
+					
+					Investigador investigador = null;
+					
+					try {
+						String dato2 = "PDT_EJB/Investigador_Bean!com.servicios.Investigador_BeanRemote";
+						Investigador_BeanRemote i = (Investigador_BeanRemote) InitialContext.doLookup(dato2);
+						
+						investigador = i.findInvestigador(LogIn.textUsuario.getText(), String.valueOf(LogIn.password.getPassword()));
+
+					} catch(NamingException | ServiciosException ex) {
+						ex.getMessage();
+					}
+					
+					if(investigador != null) {
+						EstacionesDeMedicion estacion = new EstacionesDeMedicion(n,la,lo,ca,hu,investigador,depa);
+						
+						try {
+							String dato3 = "PDT_EJB/EstacionDeMedicion_Bean!com.servicios.EstacionDeMedicion_BeanRemote";
+							EstacionDeMedicion_BeanRemote ciu = (EstacionDeMedicion_BeanRemote) InitialContext.doLookup(dato3);
+
+							if(ciu.insert(estacion)) {
+								JOptionPane.showMessageDialog(null, "Estacion de Medicion ingresada al sistema");
+								limpiar();
+							}
+							else {
+								JOptionPane.showMessageDialog(null, "No es posible añadir esta Estación de Medicion al Sistema");
+							}
+							
+						} catch(NamingException | ServiciosException ex) {
+							ex.getMessage();
 						}
-						else {
-							JOptionPane.showMessageDialog(null, "No es posible aÃ±adir esta EstaciÃ³n de Medicion al Sistema");
-						}
+						
 					}
 				}
 				else {
-					JOptionPane.showMessageDialog(null, "No es posible aÃ±adir el registro, campos obligatorios sin rellenar");
+					JOptionPane.showMessageDialog(null, "No es posible añadir el registro, campos obligatorios sin rellenar");
 				}
 			}
 		});
 	}
-}
 
+
+
+	public void limpiar() {
+		textNombre.setText("");
+		textLatitud.setText("");
+		textLongitud.setText("");
+		textHumedad.setText("");
+		textCalidad.setText("");
+		comboBox_Departamento.setSelectedItem("");
+	}
+}
